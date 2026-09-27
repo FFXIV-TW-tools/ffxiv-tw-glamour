@@ -151,6 +151,18 @@
     </div>
   </div>
 
+  <div class="codex-modal-overlay" id="folder-prompt" hidden>
+    <div class="codex-modal" role="dialog" aria-modal="true" aria-labelledby="folder-prompt-title">
+      <div class="codex-modal__header"><h3 class="codex-h3" id="folder-prompt-title">請再選一次遊戲資料夾</h3><button type="button" class="codex-modal__close" id="folder-prompt-close" aria-label="關閉">×</button></div>
+      <div class="codex-modal__body codex-body">
+        <p>重新開啟網頁後，瀏覽器不能自動讀取電腦上的遊戲檔案，目前畫面使用的是上次保存的資料。要換裝、調整外貌或改用還沒用過的背景，請再選一次台服遊戲資料夾。</p>
+        <p>如果視窗已停在你的遊戲資料夾，直接按視窗裡的「上傳」，Chrome 再問一次時也按「上傳」；檔案只在這個瀏覽器裡讀取，不會上傳。</p>
+        <p id="folder-prompt-resume" hidden></p>
+      </div>
+      <div class="codex-modal__footer"><button type="button" class="codex-btn codex-btn--ghost" id="folder-prompt-cancel">取消</button><button type="button" class="codex-btn codex-btn--primary" id="folder-prompt-pick">選遊戲資料夾</button></div>
+    </div>
+  </div>
+
   <footer class="glamour-footer codex-small"><a class="codex-xs" href="https://xivtc.com/" data-hub-link>← FF14 工具箱（全部工具）</a></footer>
   <script type="module" src="./js/app/game-app.js"></script>
 </body>

@@ -18,6 +18,7 @@ const dl = new DownloadPanel($('#download'), BUNDLE_LABEL);
 const state = { degrees: 0, zoom: 1, center: [0.5, 0.5], bundle: 'indoor' };
 let view, panel, look, packs, busy = false, pending = false, pendingInteractive = false, switching = false, settleTimer;
 let clientCache, cachedMode = false, restoring = false;
+let resumeAfterFolder = null; // 用上次保存的資料時被擋的操作；重選同版本資料夾後接著完成
 window.gameView = () => view; // 開發驗證時讀回實際 WebGL 畫面；公開頁面不讀本機路徑。
 
 function saveSession() {
@@ -33,8 +34,9 @@ function saveSession() {
   }));
 }
 
-function needFolder() {
-  guide.cachedPrompt();
+function needFolder(resume = null, resumeText = '') {
+  resumeAfterFolder = resume;
+  guide.cachedPrompt({ resumeText: resume ? resumeText : '', onCancel: () => { resumeAfterFolder = null; } });
   status('要調整外貌或換裝，請先選遊戲資料夾。');
 }
 
@@ -256,6 +258,8 @@ async function loadBackground(key, selectedPacks, changeFolder = false, snapshot
 
 async function selectFiles(fileList) {
   if (switching || !fileList?.length) return;
+  const resume = resumeAfterFolder;
+  resumeAfterFolder = null;
   guide.packsLoading();
   status('正在讀取你選取的遊戲資料檔案…');
   try {
@@ -274,6 +278,7 @@ async function selectFiles(fileList) {
         cachedMode = false;
         guide.packsReady(look);
         status('已讀取遊戲資料夾，可以繼續調整外貌與換裝。');
+        await resume?.();
         return;
       }
     }
@@ -289,10 +294,13 @@ async function selectFiles(fileList) {
 
 // Chrome 的傳統資料夾選擇可選 Program Files；File System Access API 不行（sqpack-pick.js）。
 $('#pick').addEventListener('click', () => { if (!switching) $('#pick-dir').click(); });
-for (const id of ['pick-dir', 'files']) $("#" + id).addEventListener('change', async (event) => {
-  await selectFiles(event.target.files);
-  event.target.value = ''; // 同一個資料夾再次選擇也要觸發 change。
-});
+for (const id of ['pick-dir', 'files']) {
+  $("#" + id).addEventListener('change', async (event) => {
+    await selectFiles(event.target.files);
+    event.target.value = ''; // 同一個資料夾再次選擇也要觸發 change。
+  });
+  $("#" + id).addEventListener('cancel', () => { resumeAfterFolder = null; });
+}
 
 $('#angle').addEventListener('input', event => { setAngle(Number(event.target.value)); redraw({ interactive: true }); });
 $('#left').addEventListener('click', () => { setAngle(state.degrees - 15); redraw(); });

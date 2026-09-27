@@ -112,7 +112,6 @@ export class SlotPanel {
 
   async togglePicker(slot) {
     const row = this.rows[slot];
-    if (this.canEdit && !this.canEdit()) { this.needFolder(); return; }
     if (row.loading) return;
     const opening = row.picker.hidden;
     for (const [name, other] of Object.entries(this.rows)) {
@@ -185,7 +184,10 @@ export class SlotPanel {
 
   async wear(slot, item) {
     const row = this.rows[slot];
-    if (this.canEdit && !this.canEdit()) { this.needFolder(); return; }
+    if (this.canEdit && !this.canEdit()) {
+      this.needFolder(() => this.wear(slot, item), item ? `選好後會直接換上「${item.name}」。` : `選好後會直接把${SLOT_LABEL[slot]}恢復成預設服裝。`);
+      return;
+    }
     row.error.hidden = true;
     this.status(item ? `預覽「${item.name}」…` : `${SLOT_LABEL[slot]}恢復預設服裝…`);
     try {

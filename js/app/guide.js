@@ -83,6 +83,20 @@ export class Guide {
       this.root.querySelector('#guide-steps').hidden = false;
       this.root.querySelector('#guide-summary').hidden = true;
     });
+    const prompt = document.querySelector('#folder-prompt');
+    const closePrompt = (picked) => {
+      if (prompt.hidden) return;
+      prompt.hidden = true;
+      this.promptRelease?.();
+      const cancel = this.promptCancel;
+      this.promptRelease = this.promptCancel = null;
+      // 仍在按鈕點擊的使用者操作內，才能開啟資料夾選擇視窗。
+      if (picked) this.root.querySelector('#pick').click(); else cancel?.();
+    };
+    prompt.querySelector('#folder-prompt-pick').addEventListener('click', () => closePrompt(true));
+    for (const id of ['folder-prompt-cancel', 'folder-prompt-close']) prompt.querySelector(`#${id}`).addEventListener('click', () => closePrompt(false));
+    prompt.addEventListener('click', (event) => { if (event.target === prompt) closePrompt(false); });
+    prompt.addEventListener('keydown', (event) => { if (event.key === 'Escape') { event.stopPropagation(); closePrompt(false); } });
   }
 
   setStage(stage) {
@@ -128,9 +142,20 @@ export class Guide {
     document.querySelector('#view-empty').hidden = true;
     this.setStage('adjust');
   }
-  cachedPrompt() {
+  /** 用上次保存的資料時被擋的操作：在原處開說明視窗，不把側欄捲到資料夾按鈕。 */
+  cachedPrompt({ resumeText = '', onCancel = null } = {}) {
     this.root.querySelector('#data-state').textContent = '要調整外貌或換裝，請先選遊戲資料夾。';
-    this.root.querySelector(this.root.querySelector('#guide-summary').hidden ? '#pick' : '#guide-summary-pick').focus();
+    const prompt = document.querySelector('#folder-prompt');
+    const resume = prompt.querySelector('#folder-prompt-resume');
+    resume.textContent = resumeText;
+    resume.hidden = !resumeText;
+    this.promptCancel = onCancel;
+    if (!prompt.hidden) return;
+    prompt.hidden = false;
+    const releaseScroll = window.FFXIVScrollLock?.lock();
+    const releaseFocus = window.FFXIVA11y?.trapFocus(prompt.querySelector('.codex-modal'));
+    if (!releaseFocus) prompt.querySelector('#folder-prompt-pick').focus();
+    this.promptRelease = () => { releaseFocus?.(); releaseScroll?.(); };
   }
   compactFolder(compact) {
     this.root.querySelector('#guide-default-intro').hidden = compact;
