@@ -24,7 +24,7 @@ export class Guide {
       <div class="glamour-guide-head">
         <span class="codex-label">開始預覽</span>
         <p id="guide-next" class="codex-body" role="status">下一步：選擇電腦上的台服遊戲資料夾。</p>
-        <p class="codex-body glamour-requirement"><strong>必須在已安裝台服遊戲主程式的電腦上使用。</strong>本工具讀取你電腦上的遊戲檔案來顯示角色，沒有安裝遊戲就無法使用。</p>
+        <p class="codex-body codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn"><strong>必須在已安裝台服遊戲主程式的電腦上使用。</strong>本工具讀取你電腦上的遊戲檔案來顯示角色，沒有安裝遊戲就無法使用。</p>
       </div>
       <ol class="codex-steps" id="guide-steps" aria-label="開始使用的步驟">
         <li class="codex-step is-current" aria-current="step" data-guide-step="folder"><span class="codex-step__mark" aria-hidden="true"></span><span class="codex-step__body"><span class="codex-step__title">選遊戲資料夾</span><span class="codex-step__hint">在本機讀取遊戲資料</span></span></li>

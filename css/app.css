@@ -21,9 +21,7 @@ body {
 .glamour-view-empty .codex-h2 { margin: 0 0 var(--space-3); }
 .glamour-view-empty .codex-body { max-width: 48ch; margin: 0 auto; }
 .glamour-view-empty .codex-btn { pointer-events: auto; }
-.glamour-requirement { border-left: 3px solid var(--color-warn); background: var(--color-warn-soft); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); text-align: left; }
-.glamour-requirement strong { color: var(--color-warn); }
-.glamour-view-empty .glamour-requirement { margin-bottom: var(--space-3); }
+.glamour-view-empty .codex-tint-panel { margin-bottom: var(--space-3); }
 .glamour-sidebar { min-width: 0; max-height: calc(100vh - 142px); overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: var(--space-3); padding-right: var(--space-1); }
 .glamour-sidebar > .codex-tablet { padding: var(--space-4); }
 .glamour-sidebar .codex-h2 { margin: 0 0 var(--space-2); }

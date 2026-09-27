@@ -4,6 +4,7 @@ sitemap.xml
 index.html
 favicon.svg
 favicon-192.png
+favicon.ico
 css
 js
 data

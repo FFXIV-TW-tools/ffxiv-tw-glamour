@@ -1,6 +1,6 @@
 # 更新紀錄
 
-## 尚未發布
+## 2026-09-28 — 初版上線（https://glamour.xivtc.com/）
 
 - 建立角色幻化預覽公開頁面：選取本機台服遊戲資料、可略過的外貌存檔載入、裝備與染劑調整、5 種背景切換與操作引導。
 - 各背景首次使用時才下載，顯示即時流量與進度，並在瀏覽器內快取。
@@ -11,3 +11,6 @@
 - 修正重開網頁、自動還原上次預覽後，按裝備「更換」會把側欄捲到最上方而無法選裝：現在可直接瀏覽裝備清單；選好裝備時在原處說明需要再選一次遊戲資料夾，選好後自動換上剛才選的裝備，取消則不套用。
 - 設定同步改走本站同源的 `/settings-api/` 代理（Pages Functions＋service binding）。
 - 頁面明示「必須在已安裝台服遊戲主程式的電腦上使用」：預覽區初始畫面、右側「開始預覽」、使用須知最上方與手機提示都會顯示。
+- 「必須安裝遊戲主程式」提示改用 portal 共用的 `codex-tint-panel`（左緣色條＋警示色），刪除本站自刻的樣式。
+- `robots.txt` 的 AI 爬蟲封鎖清單補上 `Claude-User`、`Claude-SearchBot`，與 portal 一致；`favicon-192.png` 換回 portal 同一份、補 `favicon.ico` 並列入發布允許清單（哨兵 `check-robots-consistency`／`check-favicon` 抓到）。
+- 上線驗收紀錄與剩餘的 Owner 後台動作見 `docs/release-checklist.md`；上線後已知待辦記在 `docs/BACKLOG.md`（B-008、B-009）。
