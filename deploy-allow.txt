@@ -7,3 +7,5 @@ favicon-192.png
 css
 js
 data
+_routes.json
+functions

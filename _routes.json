@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "description": "Pages Functions 只攔設定 API 同源代理；HTML 與靜態資產不計入 Function 請求。",
+  "include": ["/settings-api/*"],
+  "exclude": []
+}
