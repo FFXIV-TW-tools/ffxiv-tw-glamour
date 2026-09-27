@@ -299,6 +299,12 @@ $('#left').addEventListener('click', () => { setAngle(state.degrees - 15); redra
 $('#right').addEventListener('click', () => { setAngle(state.degrees + 15); redraw(); });
 $('#zero').addEventListener('click', () => { setAngle(0); setViewState(state.zoom, null); redraw(); });
 $('#zoom').addEventListener('input', event => { zoomAt(Number(event.target.value), [0.5, 0.5]); presentOnly(); });
+$('#view-controls-toggle').addEventListener('click', event => {
+  const body = $('#view-controls-body'), button = event.currentTarget;
+  body.hidden = !body.hidden;
+  button.setAttribute('aria-expanded', String(!body.hidden));
+  button.textContent = body.hidden ? '顯示背景與轉動' : '收起';
+});
 
 let drag;
 function bindDrag(canvas) {

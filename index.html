@@ -82,10 +82,13 @@
       </div>
       <div id="download" class="glamour-download codex-body" role="status" aria-live="polite" hidden></div>
       <div class="glamour-view-controls codex-body" role="group" aria-label="背景、轉動與縮放">
-        <span>背景</span><div id="bundles" class="glamour-backgrounds" role="group" aria-label="選擇背景"></div>
-        <label for="angle">轉動</label><input type="range" id="angle" min="-180" max="180" step="1" value="0" aria-label="轉動角度"><span class="glamour-value" id="angle-v">0°</span>
-        <label for="zoom">縮放</label><input type="range" id="zoom" min="1" max="4" step="0.25" value="1" aria-label="放大倍數"><span class="glamour-value" id="zoom-v">1×</span>
-        <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left">⟲ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right">⟳ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero">回正</button></div>
+        <div class="glamour-view-body" id="view-controls-body">
+          <span>背景</span><div id="bundles" class="glamour-backgrounds" role="group" aria-label="選擇背景"></div>
+          <label for="angle">轉動</label><input type="range" id="angle" min="-180" max="180" step="1" value="0" aria-label="轉動角度"><span class="glamour-value" id="angle-v">0°</span>
+          <label for="zoom">縮放</label><input type="range" id="zoom" min="1" max="4" step="0.25" value="1" aria-label="放大倍數"><span class="glamour-value" id="zoom-v">1×</span>
+          <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left">⟲ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right">⟳ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero">回正</button></div>
+        </div>
+        <button type="button" class="codex-btn codex-btn--ghost glamour-view-toggle" id="view-controls-toggle" aria-expanded="true" aria-controls="view-controls-body">收起</button>
       </div>
     </section>
     <aside class="glamour-sidebar" aria-label="角色設定及說明">
