@@ -1,0 +1,9 @@
+.gitignore
+AGENTS.md
+CLAUDE.md
+README.md
+CHANGELOG.md
+package.json
+devloop.json
+docs
+tools

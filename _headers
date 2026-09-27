@@ -1,0 +1,36 @@
+# Cloudflare Pages 安全標頭與快取設定。由 portal templates/_headers 複製，僅擴充本工具來源。
+# CSP 已放行 portal CDN 全 src（fat-cat / header / settings 等資產）+ CF Web Analytics。
+# https://developers.cloudflare.com/pages/configuration/headers/
+#
+# ⚠ connect-src 的 discord.com / discordapp.com **不要刪**，即使這個工具跟 Discord 無關：
+# portal 設定 modal 注入的「測試發送」按鈕是從**當前頁面**直接 POST 到使用者的 Discord
+# webhook（不經任何後端），少了這兩個來源，瀏覽器在送出前就擋掉、只回「Failed to fetch」
+# ——症狀看起來像 webhook 設錯或 Discord 掛了，實際是 CSP。2026-08-02 由使用者回報才發現，
+# 當時 13 個工具中 10 個中招：sub-timer 早年補過，但**沒有回流到本範本**，之後每個新工具
+# 都從缺這兩行的版本複製。範本是這條規則的唯一散布點，改它之前先想清楚。
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://ffxiv-tw-tools-portal.pages.dev https://xivtc.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://ffxiv-tw-tools-portal.pages.dev https://xivtc.com; img-src 'self' data: https://ffxiv-tw-tools-portal.pages.dev https://xivtc.com https://v2.xivapi.com; connect-src 'self' https://xivtc.com https://glamour-data.xivtc.com https://ffxiv-tw-tools-settings-api.ffxiv-tw-tools.workers.dev https://discord.com https://discordapp.com https://cloudflareinsights.com; media-src 'self' https://ffxiv-tw-tools-portal.pages.dev https://xivtc.com; font-src 'self' https://ffxiv-tw-tools-portal.pages.dev https://xivtc.com data:; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
+
+# 工具自家 JS / CSS — max-age=0 + must-revalidate → push 完 F5 即時更新（免 Ctrl+Shift+R）
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 資料檔 — 同 JS/CSS：max-age=0 + must-revalidate
+# 資料是「push 完就該生效」的東西（配方/座標/價格表），預設快取會讓玩家看到舊資料且不知道，
+# 而且沒有任何錯誤訊號。有 data/ 目錄的工具**必須**保留這段。
+/data/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# HTML 入口 — 永遠跟 server 重驗證
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache

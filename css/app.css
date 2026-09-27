@@ -1,0 +1,73 @@
+/* @component glamour-workspace @scope tool
+ * @reason 大型 WebGL 畫布與固定側欄並排；共用容器沒有此視窗式結構。 @review-after 2027-03 */
+:root { --accent: var(--color-accent-cyan); }
+[hidden] { display: none !important; }
+body {
+  font-family: var(--font-sans, "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif);
+  background: var(--pattern-overlay), var(--pattern-scanline), var(--gradient-body);
+  color: var(--color-text);
+  min-height: 100vh;
+  padding-top: 64px;
+}
+.glamour-header-tools { display: flex; align-items: center; gap: var(--space-3); }
+.glamour-header-tools > * { flex: 0 0 auto; }
+.glamour-header-tools #status { max-width: min(38vw, 520px); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0; }
+.glamour-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(380px, 29%); gap: var(--space-4); margin: 0 var(--space-4) var(--space-4); min-height: calc(100vh - 154px); }
+.glamour-viewer { min-width: 0; min-height: 640px; position: relative; display: grid; place-items: center; overflow: hidden; padding: var(--space-4); background: var(--color-bg-deep, var(--color-bg)); }
+.glamour-viewer canvas { width: 100%; max-height: calc(100vh - 240px); aspect-ratio: 16 / 9; display: block; cursor: grab; touch-action: none; }
+.glamour-viewer canvas:active { cursor: grabbing; }
+.glamour-view-empty { position: absolute; inset: var(--space-4) var(--space-4) 140px; display: grid; place-content: center; text-align: center; padding: var(--space-6); pointer-events: none; }
+.glamour-view-empty .codex-h2 { margin: 0 0 var(--space-3); }
+.glamour-view-empty .codex-body { max-width: 48ch; margin: 0 auto; }
+.glamour-view-empty .codex-btn { pointer-events: auto; }
+.glamour-sidebar { min-width: 0; max-height: calc(100vh - 142px); overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: var(--space-3); padding-right: var(--space-1); }
+.glamour-sidebar > .codex-tablet { padding: var(--space-4); }
+.glamour-sidebar .codex-h2 { margin: 0 0 var(--space-2); }
+.glamour-sidebar .codex-body { line-height: var(--lh-normal); }
+.glamour-guide-head p { margin: var(--space-2) 0 var(--space-3); }
+.glamour-guide-part { border-top: 1px solid var(--color-border); padding: var(--space-3) 0; }
+.glamour-guide-part .codex-h3 { margin: 0; }
+.glamour-guide-part p { margin: var(--space-2) 0; }
+.glamour-guide-part .codex-code, .glamour-path { overflow-wrap: anywhere; }
+.glamour-guide-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.glamour-guide-howto { padding-inline-start: var(--space-5); margin: var(--space-2) 0; }
+.glamour-guide-howto li + li { margin-top: var(--space-2); }
+.glamour-guide-alt { margin: var(--space-3) 0 0; }
+.glamour-guide-alt .codex-accordion__body { padding-inline: var(--space-2); }
+.glamour-guide-alt .codex-input { width: 100%; margin-top: var(--space-2); }
+.glamour-path { display: flex; align-items: center; gap: var(--space-2); border: 1px solid var(--color-border); padding: var(--space-2); background: var(--color-bg); border-radius: var(--radius-sm); }
+.glamour-path code { flex: 1; min-width: 0; }
+.glamour-path button { flex: 0 0 auto; }
+.glamour-guide-summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2); }
+.glamour-side-notice { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.glamour-side-notice > span { flex: 1; min-width: 0; }
+.glamour-view-controls { position: absolute; left: 50%; bottom: var(--space-4); transform: translateX(-50%); width: min(750px, calc(100% - 32px)); padding: var(--space-3); display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-surface) 94%, transparent); backdrop-filter: blur(8px); }
+.glamour-view-controls label { white-space: nowrap; }
+.glamour-view-controls input[type=range] { width: 100%; accent-color: var(--accent); }
+.glamour-view-controls .glamour-value { width: 48px; text-align: right; font-variant-numeric: tabular-nums; }
+.glamour-backgrounds { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: var(--space-1); min-height: 38px; }
+.glamour-backgrounds button[aria-pressed=true] { border-color: var(--accent); color: var(--accent); background: var(--color-accent-cyan-soft); }
+.glamour-view-buttons { display: flex; justify-content: center; gap: var(--space-2); grid-column: 1 / -1; }
+.glamour-download { position: absolute; top: var(--space-4); left: var(--space-4); width: min(390px, calc(100% - 32px)); border: 1px solid var(--color-border); padding: var(--space-3); background: color-mix(in srgb, var(--color-surface) 96%, transparent); border-radius: var(--radius-md); backdrop-filter: blur(8px); }
+.glamour-download .glamour-dl-head { display: flex; justify-content: space-between; align-items: center; color: var(--accent); font-weight: var(--fw-semibold); }
+.glamour-download .glamour-dl-title { margin: var(--space-2) 0 0; }
+.glamour-download .glamour-dl-line { margin: 0; font-variant-numeric: tabular-nums; }
+.glamour-download .glamour-dl-hint { margin: var(--space-1) 0 0; }
+.glamour-download .glamour-dl-done { margin: var(--space-2) 0 0; padding-left: var(--space-4); }
+.glamour-download .glamour-dl-error, #gpu.glamour-gpu-warn { color: var(--color-danger); }
+#gpu { white-space: pre-line; margin: 0; }
+#report { white-space: pre-wrap; overflow-wrap: anywhere; }
+.glamour-differences summary { cursor: pointer; }
+.glamour-differences li { margin: var(--space-2) 0; }
+.glamour-footer { padding: 0 var(--space-4) var(--space-3); }
+.glamour-mobile-notice { display: none; }
+@media (max-width: 1020px), (hover: none) and (pointer: coarse) {
+  .glamour-workspace { display: none; }
+  .glamour-mobile-notice { display: block; margin: var(--space-4); padding: var(--space-5); }
+  .glamour-mobile-notice .codex-h2 { margin-top: 0; }
+  .glamour-header-tools #status { display: none; }
+}
+@media (max-width: 640px) {
+  .glamour-header-tools { width: 100%; justify-content: end; }
+  .glamour-mobile-notice { margin: var(--space-3); }
+}

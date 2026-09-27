@@ -1,0 +1,94 @@
+/* 遊戲外貌的圖示選項與 8 欄色票不是一般表單按鈕；一般動作沿用 codex 元件。 */
+#look, #slots { min-width: 0; }
+#look [hidden], #slots [hidden] { display: none; }
+.glamour-look-header { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+.glamour-look-header strong { color: var(--accent, var(--color-accent-cyan)); }
+.glamour-look-header p { margin: var(--space-1) 0 0; }
+.glamour-look-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
+#look-error { margin: var(--space-3) 0; white-space: pre-line; }
+.glamour-look-adjust { margin-top: var(--space-3); }
+.glamour-look-adjust > .codex-accordion__body { padding: var(--space-2); }
+.glamour-look-editor { min-width: 0; }
+.glamour-look-field { display: block; min-width: 0; margin: var(--space-3) 0; }
+.glamour-look-field .codex-field__label { display: block; margin-bottom: var(--space-2); }
+.glamour-look-field .codex-select { width: 100%; }
+.glamour-look-range-head { display: flex; justify-content: space-between; gap: var(--space-2); }
+.glamour-look-range { width: 100%; accent-color: var(--accent, var(--color-accent-cyan)); cursor: pointer; }
+.glamour-look-toggle { margin: var(--space-3) 0; }
+.glamour-look-choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: var(--space-2); max-height: 235px; overflow-y: auto; padding: var(--space-1); }
+.glamour-look-hair-grid { max-height: 330px; }
+.glamour-look-choice { position: relative; display: grid; justify-items: center; align-content: center; gap: var(--space-1); min-height: 64px; padding: var(--space-1); color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xs); cursor: pointer; }
+.glamour-look-choice:hover, .glamour-look-choice:focus-visible { border-color: var(--accent, var(--color-accent-cyan)); }
+.glamour-look-choice[aria-pressed="true"] { border: 2px solid var(--accent, var(--color-accent-cyan)); box-shadow: 0 0 0 2px var(--color-accent-cyan-soft); }
+.glamour-look-choice:disabled { cursor: not-allowed; opacity: .55; }
+.glamour-look-choice-icon { position: relative; display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; background: var(--color-surface-hover); border-radius: var(--radius-xs); }
+.glamour-look-choice-image { position: absolute; inset: 0; width: 40px; height: 40px; object-fit: contain; }
+.glamour-look-choice-fallback { color: var(--color-text-muted); font-size: var(--fs-xs); white-space: nowrap; }
+.glamour-look-unlock { position: absolute; right: 0; top: 0; padding: 0 var(--space-1); color: var(--color-warn); background: var(--color-bg); }
+.glamour-look-swatches { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--space-1); max-width: 360px; }
+.glamour-look-swatch { aspect-ratio: 1; min-width: 0; min-height: 24px; background: var(--glamour-swatch); border: 1px solid var(--color-border); border-radius: var(--radius-xs); cursor: pointer; }
+.glamour-look-swatch:hover, .glamour-look-swatch:focus-visible { outline: 2px solid var(--accent, var(--color-accent-cyan)); outline-offset: 1px; }
+.glamour-look-swatch[aria-pressed="true"] { outline: 3px solid var(--accent, var(--color-accent-cyan)); outline-offset: 2px; }
+.glamour-look-range:disabled { cursor: not-allowed; opacity: .55; }
+.glamour-look-note { padding: var(--space-2); border-left: 2px solid var(--color-warn); }
+
+/* 已穿戴裝備緊湊雙行資訊；完整資料與來源留在展開的更換清單。 */
+.glamour-slot { position: relative; margin: var(--space-1) 0; padding: var(--space-2); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.glamour-slot-main { position: relative; display: grid; grid-template-columns: 4.2em minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-1); }
+.glamour-slot-label { color: var(--accent, var(--color-accent-cyan)); white-space: nowrap; }
+.glamour-slot-worn { min-width: 0; }
+.glamour-slot-compact { display: flex; align-items: center; min-width: 0; gap: var(--space-1); }
+.glamour-slot-compact-text { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glamour-slot-compact-text .glamour-slot-item-name { display: block; }
+.glamour-slot-compact-stats { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.glamour-slot-item { display: flex; align-items: center; min-width: 0; gap: var(--space-2); padding: var(--space-2); border-bottom: 1px solid var(--color-border); }
+.glamour-slot-item-body { display: flex; align-items: center; flex: 1; min-width: 0; gap: var(--space-2); padding: 0; text-align: left; color: var(--color-text); background: none; border: 0; }
+button.glamour-slot-item-body { cursor: pointer; }
+button.glamour-slot-item-body:hover .glamour-slot-item-name, button.glamour-slot-item-body:focus-visible .glamour-slot-item-name { text-decoration: underline; }
+.glamour-slot-icon { width: 32px; height: 32px; flex: 0 0 32px; object-fit: contain; }
+.glamour-slot-icon--empty { background: var(--color-bg); border: 1px solid var(--color-border); box-sizing: border-box; }
+.glamour-slot-item-content { display: flex; flex-direction: column; min-width: 0; gap: var(--space-1); }
+.glamour-slot-item-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--fw-semibold); }
+.glamour-slot-item-name[data-rarity="1"] { color: var(--color-rarity-common); }
+.glamour-slot-item-name[data-rarity="2"] { color: var(--color-rarity-uncommon); }
+.glamour-slot-item-name[data-rarity="3"] { color: var(--color-rarity-rare); }
+.glamour-slot-item-name[data-rarity="4"] { color: var(--color-rarity-epic); }
+.glamour-slot-item-name[data-rarity="7"] { color: var(--color-rarity-relic); }
+.glamour-slot-item-stats { line-height: var(--lh-normal); }
+.glamour-slot-restriction { align-self: flex-start; }
+.glamour-slot-source { flex: none; white-space: nowrap; color: var(--accent, var(--color-accent-cyan)); }
+.glamour-slot-source:hover { text-decoration: underline; }
+.glamour-slot-filters { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
+.glamour-slot-search-field { flex: 1 1 210px; }
+.glamour-slot-filters .codex-input { width: 100%; }
+.glamour-slot-results { max-height: 420px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.glamour-slot-hint { margin: 0; padding: var(--space-2); }
+.glamour-slot-picker-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }
+.glamour-slot-current-source { color: var(--accent, var(--color-accent-cyan)); }
+.glamour-slot-current-source:hover { text-decoration: underline; }
+.glamour-slot-error { color: var(--color-danger); }
+.glamour-slot-dyes { display: flex; gap: var(--space-1); }
+.glamour-slot-dye-button { width: 32px; height: 32px; flex: none; padding: 0; border: 1px solid var(--color-border); border-radius: var(--radius-xs); background: var(--glamour-dye-color); cursor: pointer; }
+.glamour-slot-dye-button.is-empty { border-style: dashed; }
+.glamour-slot-dye-button:hover, .glamour-slot-dye-button:focus-visible { outline: 2px solid var(--accent, var(--color-accent-cyan)); outline-offset: 1px; }
+
+/* 染劑色系為同一面板的切換口徑；色票以遊戲順序網格排列。 */
+.glamour-dye-pop { position: absolute; top: calc(100% + var(--space-1)); left: var(--space-2); right: var(--space-2); z-index: var(--z-dropdown); padding: var(--space-3); background: var(--color-surface); border: 1px solid var(--accent, var(--color-accent-cyan)); box-shadow: var(--shadow-card-hover); border-radius: var(--radius-md); }
+.glamour-dye-pop-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); font-weight: var(--fw-semibold); }
+.glamour-dye-tabs { margin: var(--space-2) 0; }
+.glamour-dye-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--space-1); }
+.glamour-dye-swatch { aspect-ratio: 1; min-height: 24px; min-width: 0; border: 1px solid var(--color-border); border-radius: var(--radius-xs); cursor: pointer; }
+.glamour-dye-swatch[aria-pressed="true"], .glamour-dye-swatch:focus-visible { outline: 2px solid var(--accent, var(--color-accent-cyan)); outline-offset: 1px; }
+.glamour-dye-name { margin-top: var(--space-2); }
+
+@media (pointer: coarse) {
+  .glamour-slot-dye-button { width: 44px; height: 44px; }
+}
+@media (max-width: 700px) {
+  .glamour-slot-main { grid-template-columns: 4.2em minmax(0, 1fr) auto; }
+  .glamour-slot-dyes { grid-column: 2; grid-row: 2; }
+  .glamour-slot-change { grid-column: 3; grid-row: 1 / 3; }
+  .glamour-slot-item { flex-wrap: wrap; }
+  .glamour-slot-source { margin-left: 48px; }
+  .glamour-look-swatch, .glamour-dye-swatch { min-height: 34px; }
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 首屏預留 portal 導覽列高度；須與 css/app.css 的 body padding 一致。 -->
+<style>html{scrollbar-gutter:stable;color-scheme:dark}html,body{margin:0}body{box-sizing:border-box;min-height:100vh;padding:64px 0 0}</style>
+<!-- GSC 帳號共用驗證碼（勿改）：新工具加進 Search Console property 時會自動驗證所有權 -->
+<meta name="google-site-verification" content="d5WDZwqeL4aAN0vGxMvg4mAi1OtpBhcr_xLJJ-3sXBI">
+<meta name="tool-name" content="角色幻化預覽">
+<title>FFXIV 角色幻化預覽</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="apple-touch-icon" href="/favicon-192.png">
+<meta name="description" content="使用自己的台服遊戲資料，在瀏覽器預覽角色外貌、裝備與染劑，並切換 5 種背景；遊戲檔案不會上傳。">
+
+<link rel="canonical" href="https://glamour.xivtc.com/">
+<meta property="og:url" content="https://glamour.xivtc.com/">
+<meta property="og:site_name" content="FFXIV 繁中服工具箱">
+<meta property="og:title" content="角色幻化預覽">
+<meta property="og:description" content="使用自己的台服遊戲資料，在瀏覽器預覽角色外貌、裝備與染劑，並切換 5 種背景；遊戲檔案不會上傳。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://xivtc.com/og-image.png">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://xivtc.com">
+<!-- Portal 共享資源 — dev mode (localhost) 抓本機 :8774，線上抓 CDN（不要動）-->
+<!-- settings-client.js：暴露 window.FFXIVSettings（Discord webhook / 全域偏好 SDK，navbar ⚙ 用） -->
+<!-- ⚠ document.write 為唯一標準寫法：parser-inserted defer 保證執行順序。不可改 createElement
+     （動態插入 script 的 defer 被忽略當 async → 順序不保證 → FFXIVSettings 晚 ready）。
+     error boundary 不用自帶 — header.js 已中央化。長時開 tab 的工具加掛 version-check.js。 -->
+<script>(function(){
+  var dev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var base = dev ? 'http://localhost:8774/ffxiv-tw-tools-portal/' : 'https://xivtc.com/';
+  document.write(
+    '<link rel="stylesheet" href="' + base + 'tokens.css">' +
+    '<link rel="stylesheet" href="' + base + 'header.css">' +
+    '<script defer src="' + base + 'header.js"><\/script>' +
+    '<script defer src="' + base + 'settings-client.js"><\/script>'
+  );
+})();</script>
+
+<link rel="stylesheet" href="./css/app.css">
+<link rel="stylesheet" href="./css/panels.css">
+
+<!-- 結構化資料：與上方 meta 保持一致。 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "角色幻化預覽",
+  "url": "https://glamour.xivtc.com/",
+  "description": "使用自己的台服遊戲資料，在瀏覽器預覽角色外貌、裝備與染劑，並切換 5 種背景；遊戲檔案不會上傳。",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Web",
+  "browserRequirements": "需要桌面版 Chrome 或 Edge、WebGL2 與顯示卡圖形加速",
+  "inLanguage": "zh-TW",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+  "isPartOf": { "@type": "WebSite", "@id": "https://xivtc.com/#website" },
+  "publisher": { "@type": "Organization", "name": "FFXIV TW Tools", "url": "https://xivtc.com/" }
+}
+</script>
+</head>
+<body>
+  <header class="page-header">
+    <h1 class="codex-h1"><span class="ph-icon" aria-hidden="true">👗</span>角色幻化預覽 <span class="sub codex-label codex-label--muted">FFXIV 繁中服</span></h1>
+    <div class="glamour-header-tools">
+      <p id="status" class="codex-small" role="status">先選遊戲資料夾，即可預覽角色。</p>
+      <button type="button" id="notice-open" class="codex-btn codex-btn--ghost">使用須知</button>
+    </div>
+  </header>
+
+  <main class="glamour-workspace" id="ftw-main">
+    <section class="glamour-viewer codex-tablet codex-tablet--cyan" aria-label="角色幻化預覽畫面">
+      <span class="codex-hud" aria-hidden="true"></span>
+      <canvas id="view" width="2560" height="1440" aria-label="可拖曳轉動及移動的角色預覽畫面"></canvas>
+      <div class="glamour-view-empty codex-empty codex-empty--bare" id="view-empty">
+        <h2 class="codex-h2">在這裡預覽自己的角色</h2>
+        <p class="codex-body">先在右側選取台服遊戲資料夾，便能編輯外貌、更換裝備與染劑，並切換背景。</p>
+      </div>
+      <div id="download" class="glamour-download codex-body" role="status" aria-live="polite" hidden></div>
+      <div class="glamour-view-controls codex-body" role="group" aria-label="背景、轉動與縮放">
+        <span>背景</span><div id="bundles" class="glamour-backgrounds" role="group" aria-label="選擇背景"></div>
+        <label for="angle">轉動</label><input type="range" id="angle" min="-180" max="180" step="1" value="0" aria-label="轉動角度"><span class="glamour-value" id="angle-v">0°</span>
+        <label for="zoom">縮放</label><input type="range" id="zoom" min="1" max="4" step="0.25" value="1" aria-label="放大倍數"><span class="glamour-value" id="zoom-v">1×</span>
+        <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left">⟲ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right">⟳ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero">回正</button></div>
+      </div>
+    </section>
+    <aside class="glamour-sidebar" aria-label="角色設定及說明">
+      <section class="codex-tablet codex-tablet--cyan" id="guide">
+        <span class="codex-hud" aria-hidden="true"></span>
+      </section>
+      <section class="codex-tablet codex-tablet--cyan" id="look">
+        <span class="codex-hud" aria-hidden="true"></span>
+        <h2 class="codex-h2">角色外貌</h2>
+        <div class="codex-empty codex-empty--bare">選好遊戲資料夾後，就能載入外貌存檔並調整角色。</div>
+      </section>
+      <section class="codex-tablet codex-tablet--cyan" aria-label="裝備與染劑">
+        <span class="codex-hud" aria-hidden="true"></span>
+        <h2 class="codex-h2">裝備與染劑</h2>
+        <div id="slots" class="codex-empty codex-empty--bare">選好遊戲資料夾後，就能更換裝備與染劑。</div>
+      </section>
+      <section class="codex-tablet codex-tablet--cyan">
+        <span class="codex-hud" aria-hidden="true"></span>
+        <div class="glamour-side-notice"><span class="codex-body">下載流量及畫面差異，請先閱讀使用須知。</span><button type="button" class="codex-btn codex-btn--ghost" id="notice-side-open">查看須知</button></div>
+        <p id="gpu" class="codex-small" role="status"></p>
+        <details class="codex-accordion glamour-differences"><summary>和遊戲不同的地方</summary><div class="codex-accordion__body"><p class="codex-body">此預覽不保證與遊戲畫面相同。臉部特徵尚未顯示；姿勢、部分衣服與皮膚的接縫、身體遮擋、髮尾與披風的擺動、半透明衣料及光影也可能不同。詳細說明請看「使用須知」。</p></div></details>
+        <details class="codex-accordion"><summary>畫面資訊</summary><div class="codex-accordion__body"><pre id="report" class="codex-small"></pre></div></details>
+      </section>
+    </aside>
+  </main>
+
+  <section class="glamour-mobile-notice codex-tablet codex-tablet--cyan" aria-labelledby="mobile-title">
+    <span class="codex-hud" aria-hidden="true"></span>
+    <h2 class="codex-h2" id="mobile-title">請使用電腦開啟角色幻化預覽</h2>
+    <p class="codex-body">手機與平板目前無法使用此工具。請在有圖形加速功能的電腦上，使用桌面版 Chrome 開啟本頁，並選取你自己的台服遊戲資料夾。</p>
+  </section>
+
+  <div class="codex-modal-overlay" id="notice" hidden>
+    <div class="codex-modal" role="dialog" aria-modal="true" aria-labelledby="notice-title">
+      <div class="codex-modal__header"><h3 class="codex-h3" id="notice-title">使用前須知</h3><button type="button" class="codex-modal__close" id="notice-close" aria-label="關閉使用須知">×</button></div>
+      <div class="codex-modal__body codex-body">
+        <h4 class="codex-h3">免責聲明與隱私</h4>
+        <p>這是非官方的同人製作工具，與 SQUARE ENIX 或台灣營運商無關。FINAL FANTASY XIV © SQUARE ENIX。畫面僅供參考，不保證與遊戲一致，也不保證能顯示每件裝備。</p>
+        <p>你選取的遊戲檔案與外貌存檔不會上傳。本站只將預覽時用到的遊戲資料、角色與畫面設定保存在這個瀏覽器，供下次直接顯示；需要新的外貌或裝備時，再選遊戲資料夾。遊戲資料最多保存約 450 MB。</p>
+        <h4 class="codex-h3">背景下載與快取</h4>
+        <p>選好遊戲資料夾後，才會下載「室內」背景；切換到其他背景時，首次使用才下載。每個背景下載一次，之後保存在這個瀏覽器的網站資料中。要清除，可在瀏覽器設定中刪除此網站的資料；請避開有流量限制的網路。</p>
+        <p id="notice-sizes" role="status">正在查詢各背景的下載大小…</p>
+        <p>清除下方保存的遊戲資料後，下次使用需再選遊戲資料夾；已下載的背景網站資料會保留，以免重複下載。</p>
+        <button type="button" class="codex-btn codex-btn--danger" id="notice-clear">清除這個網站保存的遊戲資料</button>
+        <p id="notice-clear-status" class="codex-small" role="status"></p>
+        <h4 class="codex-h3">顯示卡與瀏覽器</h4>
+        <p>需要支援 WebGL2 並開啟圖形加速的桌面版瀏覽器。建議使用 Chrome 或 Edge；目前僅實測 Windows 上的 Chrome 1xx 與 NVIDIA RTX 5070 Ti，Edge 尚未實測。用處理器模擬繪圖時會非常慢。每種背景第一次出現時可能花數秒準備畫面。手機與平板目前不支援。</p>
+        <h4 class="codex-h3">和遊戲不同的地方</h4>
+        <ul>
+          <li>背景重現美容師畫面的 5 種場景，燈光、陰影、光暈、霧與邊緣平滑依參考畫面呈現；與實際遊戲的即時場景仍可能不同。</li>
+          <li>角色依外貌重建；部分種族使用角色製作畫面的靜止姿勢，而非你在遊戲中的動作。不同種族的外觀尚未逐一對照遊戲畫面。</li>
+          <li>臉部特徵尚未顯示；沒有參考畫面可用的特殊衣料或半透明裝備，可能無法更換或無法正確顯示。</li>
+          <li>衣服與皮膚接縫可能露出細縫，脖子等連接處也可能與遊戲不同；更換裝備時，手肘、膝蓋等原本應遮住的部位可能多露出一些。</li>
+          <li>帽子、上衣與髮型的附加部件固定在靜止姿勢；髮尾與披風不會擺動，部分上衣配件的位置尚未逐件核對。</li>
+          <li>皺褶及交界處可能比遊戲亮，亮度會使用參考畫面的固定設定；眼睛虹膜也可能有差異。</li>
+          <li>「挑染關」、「唇膏關」與「無臉彩」的顏色及無臉彩狀態已用台服遊戲資料核對。</li>
+        </ul>
+      </div>
+      <div class="codex-modal__footer"><button type="button" class="codex-btn codex-btn--primary" id="notice-ack">我已了解，開始使用</button></div>
+    </div>
+  </div>
+
+  <footer class="glamour-footer codex-small"><a class="codex-xs" href="https://xivtc.com/" data-hub-link>← FF14 工具箱（全部工具）</a></footer>
+  <script type="module" src="./js/app/game-app.js"></script>
+</body>
+</html>

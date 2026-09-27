@@ -1,0 +1,10 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": ["https://glamour.xivtc.com", "https://ffxiv-tw-glamour.pages.dev"],
+        "methods": ["GET", "HEAD"]
+      }
+    }
+  ]
+}

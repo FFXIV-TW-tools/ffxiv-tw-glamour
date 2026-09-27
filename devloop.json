@@ -1,0 +1,6 @@
+{
+  "canonicalTest": "sh deploy-prepare.sh && node ../../tools/check-design-drift.js --files index.html css/app.css css/panels.css --strict",
+  "scale": "M",
+  "delegable": true,
+  "notes": "靜態站；驗證＝部署允許清單可產出 _site＋設計檢查。背景資料不在 repo（R2，tools/upload-bundles.mjs）；需要本機遊戲資料的驗證（tools/data/verify-charamake.py、瀏覽器實測）不放進 canonicalTest。"
+}
