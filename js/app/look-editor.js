@@ -82,14 +82,15 @@ export class LookEditor {
       } else icon.textContent = '無';
       button.append(icon);
       button.append(el('span', 'glamour-look-choice-number codex-xs', String(option.id || '無')));
+      if (disabledReason) button.append(el('span', 'glamour-look-choice-reason codex-xs', '無法預覽'));
       if (option.unlockable) button.append(el('span', 'glamour-look-unlock codex-xs', '解鎖'));
       if (!button.disabled) button.addEventListener('click', () => this.change(field, option.id));
       grid.append(button);
     }
     wrap.append(grid);
     parent.append(wrap);
-    if (disabledReason) parent.append(el('p', 'glamour-look-note codex-small', disabledReason));
-    if (missing) parent.append(el('p', 'glamour-look-note codex-small', `另有 ${missing} 個選項台服尚未推出，暫不列出。`));
+    if (disabledReason) parent.append(el('p', 'codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn codex-small', disabledReason));
+    if (missing) parent.append(el('p', 'codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn codex-small', `另有 ${missing} 個選項台服尚未推出，暫不列出。`));
   }
 
   range(parent, label, field, def, current, disabledReason = '') {
@@ -111,7 +112,7 @@ export class LookEditor {
     input.addEventListener('change', () => this.change(field, +input.value));
     wrap.append(input);
     parent.append(wrap);
-    if (disabledReason) parent.append(el('p', 'glamour-look-note codex-small', disabledReason));
+    if (disabledReason) parent.append(el('p', 'codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn codex-small', disabledReason));
   }
 
   toggle(parent, label, field, value) {
@@ -172,7 +173,7 @@ export class LookEditor {
       this.range(face, range?.label ?? field, field, range, c[field]);
     }
     this.toggle(face, '小瞳孔', 'smallIris', c.smallIris);
-    const note = el('p', 'glamour-look-note codex-small', '臉部特徵目前無法在預覽畫面中呈現，因此暫不提供調整。');
+    const note = el('p', 'codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn codex-small', '臉部特徵目前無法在預覽畫面中呈現，因此暫不提供調整。');
     face.append(note);
 
     const hair = this.section('髮型與顏色');

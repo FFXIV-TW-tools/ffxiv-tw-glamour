@@ -19,7 +19,7 @@ export function wornSummary(item, character, metadata) {
   name.dataset.rarity = item.rarity;
   const restriction = inGameRestriction(item, character, metadata);
   const subline = el('span', 'glamour-slot-compact-stats codex-xs',
-    `物品等級 ${item.ilvl}・裝備等級 ${item.equipLevel}${restriction.allowed === false ? '・不可穿戴' : ''}`);
+    `物品等級 ${item.ilvl}・裝備等級 ${item.equipLevel}${restriction.allowed === false ? '・不可穿戴' : restriction.allowed === null ? '・限制未明' : ''}`);
   wrap.title = `${item.name}；${subline.textContent}；${metadata.jobs[item.job] ?? '職業限制未明'}；${restriction.label}`;
   text.append(name, subline);
   wrap.append(icon, text);

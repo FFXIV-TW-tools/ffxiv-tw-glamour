@@ -9,11 +9,20 @@ import { ClientCache, ClientCacheMissError, gameVersion } from '../game/client-c
 import { readSession, saveSession as scheduleSession, clearSession } from './session-store.js';
 import { slotItems } from './slot-data.js';
 import { noticesAcknowledged } from './guide-notice.js';
+import { iconSVG } from './glamour-visual.js';
 
 const $ = (selector) => document.querySelector(selector);
 const status = (text) => { $('#status').textContent = text; };
 const BUNDLE_LABEL = { indoor: '室內', aether: '乙太空間', coast: '海岸', forest: '森林', wilderness: '荒野' };
 const guide = new Guide($('#guide'));
+$('#look-placeholder-title .codex-view-title__ico').innerHTML = iconSVG('user-circle');
+$('#slots-title .codex-view-title__ico').innerHTML = iconSVG('sword');
+$('#left').innerHTML = `${iconSVG('arrow-counter-clockwise')}向左轉 15°`;
+$('#right').innerHTML = `${iconSVG('arrow-clockwise')}向右轉 15°`;
+$('#glamour-copy-outfit').innerHTML = `${iconSVG('copy')}複製目前穿搭`;
+const initialLook = $('#look').innerHTML;
+const initialSlots = $('#slots').innerHTML;
+const initialSlotsClass = $('#slots').className;
 const dl = new DownloadPanel($('#download'), BUNDLE_LABEL);
 const state = { degrees: 0, zoom: 1, center: [0.5, 0.5], bundle: 'indoor' };
 let view, panel, look, packs, busy = false, pending = false, pendingInteractive = false, switching = false, settleTimer;
@@ -37,7 +46,7 @@ function saveSession() {
 function needFolder(resume = null, resumeText = '') {
   resumeAfterFolder = resume;
   guide.cachedPrompt({ resumeText: resume ? resumeText : '', onCancel: () => { resumeAfterFolder = null; } });
-  status('要調整外貌或換裝，請先選遊戲資料夾。');
+  status('請重新選遊戲資料夾');
 }
 
 function showControls() {
@@ -45,7 +54,8 @@ function showControls() {
     button.setAttribute('aria-pressed', String(button.dataset.bundle === state.bundle));
     button.disabled = !view || switching;
   }
-  for (const id of ['angle', 'zoom', 'left', 'right', 'zero']) $("#" + id).disabled = !view || switching;
+  for (const id of ['angle', 'zoom', 'left', 'right', 'zero', 'glamour-refit']) $("#" + id).disabled = !view || switching;
+  $('#glamour-controls-hint').hidden = !!view;
 }
 
 /** 互動停止 200 ms 後才以新投影重播完整畫面。 */
@@ -73,14 +83,16 @@ async function redraw({ interactive = false } = {}) {
       ({ zoom: state.zoom, center: state.center } = view.setView(state));
       const ms = await view.render({ degrees: state.degrees, interactive: quick });
       view.present(state);
+      $('#glamour-view-error').hidden = true;
       saveSession();
-      status(`角度 ${state.degrees}°｜放大 ${state.zoom}×｜${quick ? '互動預覽' : '整幀'} ${Math.round(ms)} ms`);
+      status('預覽就緒');
       await new Promise(requestAnimationFrame);
       quick = pendingInteractive;
     } while (pending);
   } catch (error) {
-    ok = false;
-    status(`畫面無法更新：${error.message}`);
+    status('預覽無法更新');
+    $('#glamour-view-error').textContent = `畫面無法更新：${error.message}`;
+    $('#glamour-view-error').hidden = false;
     console.error(error);
   } finally { busy = false; }
   return ok;
@@ -93,7 +105,7 @@ function presentOnly() {
   if (busy) return; // 轉動中改變縮放時，該輪完成會用最新狀態呈現
   view.present(state);
   saveSession();
-  status(`角度 ${state.degrees}°｜放大 ${state.zoom}×｜互動預覽`);
+  status('預覽就緒');
 }
 
 function setAngle(degrees) {
@@ -138,7 +150,7 @@ function centerOnNextBackground(previous, next) {
 const SOFTWARE_RENDERER = /WARP|SwiftShader|Basic Render|llvmpipe|Software/i;
 function showRenderer(name) {
   const box = $('#gpu');
-  box.className = SOFTWARE_RENDERER.test(name) ? 'glamour-gpu-warn' : '';
+  box.className = SOFTWARE_RENDERER.test(name) ? 'codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn' : '';
   box.textContent = SOFTWARE_RENDERER.test(name)
     ? `繪圖裝置：${name}\n目前沒有用到顯示卡，是用 CPU 模擬繪圖，所以很卡。請到瀏覽器設定開啟「可用時使用圖形加速功能」（Chrome：設定 → 系統），重新啟動瀏覽器後再開這頁。`
     : `繪圖裝置：${name}`;
@@ -164,7 +176,7 @@ async function loadBackground(key, selectedPacks, changeFolder = false, snapshot
   let next, preparedLook, complete = false, stored = true;
   clientCache.beginBackground();
   try {
-    status(`準備背景「${BUNDLE_LABEL[key]}」：網站資料與遊戲資料同步載入…`);
+    status('正在準備預覽');
     next = await GameView.load(canvas, { bundle: key, packs: selectedPacks, ...dl.begin(key) });
     dl.downloaded(key);
     await next.enableEquip(selectedPacks);
@@ -225,15 +237,21 @@ async function loadBackground(key, selectedPacks, changeFolder = false, snapshot
     if (changeFolder) guide.packsReady(look);
     else if (cachedMode && snapshot) guide.cachedReady(look, clientCache.version);
     dl.finish(key);
-    status(`背景「${BUNDLE_LABEL[key]}」已就緒，角度 ${state.degrees}°，放大 ${state.zoom}×。${stored ? '' : '此瀏覽器目前無法完整保存遊戲資料，下次使用請重新選遊戲資料夾。'}`);
+    status(stored ? '預覽就緒' : '預覽就緒；此瀏覽器目前無法完整保存遊戲資料，下次使用請重新選遊戲資料夾。');
     if (previous) previous.r.gl.getExtension('WEBGL_lose_context')?.loseContext();
     complete = true;
     return true;
   } catch (error) {
     if (!previous) {
       view = panel = look = undefined;
-      $('#look').replaceChildren();
-      $('#slots').replaceChildren();
+      $('#look').innerHTML = initialLook;
+      $('#slots').className = initialSlotsClass;
+      $('#slots').innerHTML = initialSlots;
+      const copy = $('#glamour-copy-outfit');
+      copy.disabled = true;
+      copy.title = '預覽就緒後可複製目前穿搭';
+      copy.onclick = null;
+      $('#glamour-copy-status').hidden = true;
     }
     if (next) next.r.gl.getExtension('WEBGL_lose_context')?.loseContext();
     if (previousDownload?.phase === 'ready' && key === state.bundle) {
@@ -245,7 +263,8 @@ async function loadBackground(key, selectedPacks, changeFolder = false, snapshot
     if (cachedMode && error instanceof ClientCacheMissError) {
       needFolder();
     } else {
-      status(`無法準備背景「${BUNDLE_LABEL[key]}」：${error.message}${previous ? '；原畫面仍可使用。' : ''}`);
+      status('預覽準備失敗');
+      if (changeFolder || !previous) guide.packsFailed(error.message);
       console.error(error);
     }
     return false;
@@ -261,7 +280,7 @@ async function selectFiles(fileList) {
   const resume = resumeAfterFolder;
   resumeAfterFolder = null;
   guide.packsLoading();
-  status('正在讀取你選取的遊戲資料檔案…');
+  status('正在準備預覽');
   try {
     const version = await gameVersion(fileList);
     const { packs: selected } = await openClientPacks(fileList);
@@ -277,22 +296,32 @@ async function selectFiles(fileList) {
       if (!changed) {
         cachedMode = false;
         guide.packsReady(look);
-        status('已讀取遊戲資料夾，可以繼續調整外貌與換裝。');
+        status('預覽就緒');
         await resume?.();
         return;
       }
     }
     cachedMode = false;
     if (!dl.index) await dl.init();
-    if (!await loadBackground(state.bundle, realPacks, true)) guide.packsFailed($('#status').textContent);
+    await loadBackground(state.bundle, realPacks, true);
   } catch (error) {
     guide.packsFailed(error.message);
-    status(`讀取遊戲資料失敗：${error.message}${view ? '；原畫面仍可使用。' : ''}`);
+    status('遊戲資料讀取失敗');
     console.error(error);
   }
 }
 
 // Chrome 的傳統資料夾選擇可選 Program Files；File System Access API 不行（sqpack-pick.js）。
+$('#glamour-start').addEventListener('click', () => {
+  if (!noticesAcknowledged()) $('#notice-open').click();
+  else $('#pick').click();
+});
+document.querySelectorAll('.glamour-section-nav a').forEach((link) => link.addEventListener('click', (event) => {
+  event.preventDefault();
+  const sidebar = $('.glamour-sidebar');
+  const target = $(link.getAttribute('href'));
+  sidebar.scrollTo({ top: sidebar.scrollTop + target.getBoundingClientRect().top - sidebar.getBoundingClientRect().top - 64, behavior: 'instant' });
+}));
 $('#pick').addEventListener('click', () => { if (!switching) $('#pick-dir').click(); });
 for (const id of ['pick-dir', 'files']) {
   $("#" + id).addEventListener('change', async (event) => {
@@ -306,6 +335,7 @@ $('#angle').addEventListener('input', event => { setAngle(Number(event.target.va
 $('#left').addEventListener('click', () => { setAngle(state.degrees - 15); redraw(); });
 $('#right').addEventListener('click', () => { setAngle(state.degrees + 15); redraw(); });
 $('#zero').addEventListener('click', () => { setAngle(0); setViewState(state.zoom, null); redraw(); });
+$('#glamour-refit').addEventListener('click', () => { setAngle(0); fitZoom(); redraw(); });
 $('#zoom').addEventListener('input', event => { zoomAt(Number(event.target.value), [0.5, 0.5]); presentOnly(); });
 $('#view-controls-toggle').addEventListener('click', event => {
   const body = $('#view-controls-body'), button = event.currentTarget;
@@ -357,9 +387,9 @@ bindDrag($('#view'));
 $('#bundles').replaceChildren(...BUNDLES.map(key => {
   const button = document.createElement('button');
   button.type = 'button';
-  button.className = 'codex-btn codex-btn--ghost';
+  button.className = 'codex-chip';
   button.dataset.bundle = key;
-  button.textContent = BUNDLE_LABEL[key];
+  button.textContent = dl.buttonLabel(key);
   button.addEventListener('click', () => {
     if (!view || !packs) return;
     if (cachedMode && !clientCache.canUseBackground(key)) { needFolder(); return; }
@@ -368,7 +398,7 @@ $('#bundles').replaceChildren(...BUNDLES.map(key => {
   return button;
 }));
 showControls();
-status('請先選擇電腦上的台服遊戲資料夾。');
+status('待選遊戲資料夾');
 
 document.addEventListener('glamour:clear-cache', async () => {
   try {
@@ -392,11 +422,11 @@ async function restoreLastVisit() {
     if (snapshot.version !== clientCache.version) {
       await clientCache.purge();
       clearSession();
-      status('遊戲版本已變更，請重新選擇遊戲資料夾。');
+      status('待選遊戲資料夾');
       return;
     }
     if (!clientCache.canUseBackground(snapshot.bundle) || !clientCache.hasKeys(snapshot.required)) {
-      status('上次使用的遊戲資料不完整，請重新選擇遊戲資料夾。');
+      status('待選遊戲資料夾');
       return;
     }
     cachedMode = restoring = true;
@@ -407,7 +437,7 @@ async function restoreLastVisit() {
     if (!dl.index) await dl.init();
     if (await loadBackground(snapshot.bundle, clientCache.cached(), false, snapshot)) {
       window.glamourRestoreMs = Math.round(performance.now() - started);
-      status(`已還原上次的預覽（遊戲版本 ${clientCache.version}）。`);
+      status('預覽就緒');
     } else {
       cachedMode = false;
       state.bundle = 'indoor';
@@ -417,7 +447,7 @@ async function restoreLastVisit() {
     cachedMode = false;
     state.bundle = 'indoor';
     guide.packsFailed('上次保存的遊戲資料無法讀取');
-    status(`上次保存的遊戲資料無法讀取，請選遊戲資料夾：${error.message}`);
+    status('預覽還原失敗');
   } finally { restoring = false; }
 }
 restoreLastVisit();

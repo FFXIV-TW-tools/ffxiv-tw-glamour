@@ -1,5 +1,5 @@
 {
-  "canonicalTest": "node tools/check-sources.mjs && node ../../tools/check-design-drift.js --files index.html css/app.css css/panels.css --strict",
+  "canonicalTest": "node tools/check-sources.mjs && node --test tools/test-*.mjs && node ../../tools/check-design-drift.js --files index.html css/app.css css/panels.css --strict",
   "scale": "M",
   "delegable": true,
   "notes": "靜態站；驗證＝追蹤的 JS 語法＋每檔 ≤500 行＋設計檢查。發布允許清單另以 sh deploy-prepare.sh 手動確認（safe-push 的 denylist 不允許 canonicalTest 含 deploy 字樣）。背景資料不在 repo（Pages 專案 ffxiv-tw-glamour-data，tools/upload-bundles.mjs）；需要本機遊戲資料的驗證（tools/data/verify-*.py、瀏覽器實測）不放進 canonicalTest。"

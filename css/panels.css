@@ -20,26 +20,26 @@
 .glamour-look-choice { position: relative; display: grid; justify-items: center; align-content: center; gap: var(--space-1); min-height: 64px; padding: var(--space-1); color: var(--color-text); background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-xs); cursor: pointer; }
 .glamour-look-choice:hover, .glamour-look-choice:focus-visible { border-color: var(--accent, var(--color-accent-cyan)); }
 .glamour-look-choice[aria-pressed="true"] { border: 2px solid var(--accent, var(--color-accent-cyan)); box-shadow: 0 0 0 2px var(--color-accent-cyan-soft); }
+.glamour-look-choice[aria-pressed="true"]::after, .glamour-look-swatch[aria-pressed="true"]::after { content: "✓"; position: absolute; top: 0; right: 0; padding: 0 var(--space-1); color: var(--color-bg); background: var(--accent); font-weight: var(--fw-bold); }
 .glamour-look-choice:disabled { cursor: not-allowed; opacity: .55; }
 .glamour-look-choice-icon { position: relative; display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; background: var(--color-surface-hover); border-radius: var(--radius-xs); }
 .glamour-look-choice-image { position: absolute; inset: 0; width: 40px; height: 40px; object-fit: contain; }
 .glamour-look-choice-fallback { color: var(--color-text-muted); font-size: var(--fs-xs); white-space: nowrap; }
 .glamour-look-unlock { position: absolute; right: 0; top: 0; padding: 0 var(--space-1); color: var(--color-warn); background: var(--color-bg); }
 .glamour-look-swatches { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--space-1); max-width: 360px; }
-.glamour-look-swatch { aspect-ratio: 1; min-width: 0; min-height: 24px; background: var(--glamour-swatch); border: 1px solid var(--color-border); border-radius: var(--radius-xs); cursor: pointer; }
+.glamour-look-swatch { position: relative; aspect-ratio: 1; min-width: 0; min-height: 24px; background: var(--glamour-swatch); border: 1px solid var(--color-border); border-radius: var(--radius-xs); cursor: pointer; }
 .glamour-look-swatch:hover, .glamour-look-swatch:focus-visible { outline: 2px solid var(--accent, var(--color-accent-cyan)); outline-offset: 1px; }
 .glamour-look-swatch[aria-pressed="true"] { outline: 3px solid var(--accent, var(--color-accent-cyan)); outline-offset: 2px; }
 .glamour-look-range:disabled { cursor: not-allowed; opacity: .55; }
-.glamour-look-note { padding: var(--space-2); border-left: 2px solid var(--color-warn); }
 
 /* 已穿戴裝備緊湊雙行資訊；完整資料與來源留在展開的更換清單。 */
 .glamour-slot { position: relative; margin: var(--space-1) 0; padding: var(--space-2); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
 .glamour-slot-main { position: relative; display: grid; grid-template-columns: 4.2em minmax(0, 1fr) auto auto; align-items: center; gap: var(--space-1); }
 .glamour-slot-label { color: var(--accent, var(--color-accent-cyan)); white-space: nowrap; }
-.glamour-slot-worn { min-width: 0; }
+.glamour-slot-worn { min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-1); }
 .glamour-slot-compact { display: flex; align-items: center; min-width: 0; gap: var(--space-1); }
 .glamour-slot-compact-text { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.glamour-slot-compact-text .glamour-slot-item-name { display: block; }
+.glamour-slot-compact-text .glamour-slot-item-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .glamour-slot-compact-stats { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .glamour-slot-item { display: flex; align-items: center; min-width: 0; gap: var(--space-2); padding: var(--space-2); border-bottom: 1px solid var(--color-border); }
 .glamour-slot-item-body { display: flex; align-items: center; flex: 1; min-width: 0; gap: var(--space-2); padding: 0; text-align: left; color: var(--color-text); background: none; border: 0; }
@@ -48,7 +48,7 @@ button.glamour-slot-item-body:hover .glamour-slot-item-name, button.glamour-slot
 .glamour-slot-icon { width: 32px; height: 32px; flex: 0 0 32px; object-fit: contain; }
 .glamour-slot-icon--empty { background: var(--color-bg); border: 1px solid var(--color-border); box-sizing: border-box; }
 .glamour-slot-item-content { display: flex; flex-direction: column; min-width: 0; gap: var(--space-1); }
-.glamour-slot-item-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--fw-semibold); }
+.glamour-slot-item-name { min-width: 0; overflow-wrap: anywhere; font-weight: var(--fw-semibold); }
 .glamour-slot-item-name[data-rarity="1"] { color: var(--color-rarity-common); }
 .glamour-slot-item-name[data-rarity="2"] { color: var(--color-rarity-uncommon); }
 .glamour-slot-item-name[data-rarity="3"] { color: var(--color-rarity-rare); }
@@ -58,10 +58,9 @@ button.glamour-slot-item-body:hover .glamour-slot-item-name, button.glamour-slot
 .glamour-slot-restriction { align-self: flex-start; }
 .glamour-slot-source { flex: none; white-space: nowrap; color: var(--accent, var(--color-accent-cyan)); }
 .glamour-slot-source:hover { text-decoration: underline; }
-.glamour-slot-filters { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-3) 0; }
-.glamour-slot-search-field { flex: 1 1 210px; }
-.glamour-slot-filters .codex-input { width: 100%; }
-.glamour-slot-results { max-height: 420px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.glamour-slot-search-field { flex: 1 1 210px; min-width: 12rem; }
+.glamour-slot-results { min-height: 92px; max-height: 420px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.glamour-slot-picker .codex-toolbar { margin: var(--space-3) 0; }
 .glamour-slot-hint { margin: 0; padding: var(--space-2); }
 .glamour-slot-picker-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }
 .glamour-slot-current-source { color: var(--accent, var(--color-accent-cyan)); }

@@ -2,6 +2,7 @@
 import { parseCharaDat, decodeCustomize, raceCode } from '../game/customize.js';
 import { charamake, choicePath, colourPalette, invalidOptions } from './look-editor-data.js';
 import { LookEditor } from './look-editor.js';
+import { iconSVG } from './glamour-visual.js';
 
 const $ = (root, selector) => root.querySelector(selector);
 /** 缺少玩家本機遊戲資料不是暫時性錯誤；將引擎路徑轉成可行的使用者提示。 */
@@ -22,7 +23,7 @@ export class LookPanel {
     this.loaded = null;
     this.busy = false;
     root.innerHTML = `<span class="codex-hud" aria-hidden="true"></span>
-    <h2 class="codex-h2">角色外貌</h2>
+    <h2 class="codex-view-title"><span class="codex-view-title__ico" aria-hidden="true">${iconSVG('user-circle')}</span>角色外貌</h2>
     <div class="glamour-look-header">
       <div><strong id="look-name">預設角色</strong><p id="look-state" class="codex-small"></p></div>
       <span id="look-edited" class="codex-badge codex-badge--warn" hidden>已調整</span>

@@ -1,12 +1,27 @@
 // 裝備部位：選好遊戲資料夾即讀預設服裝小檔；按下「更換」才讀取該部位的完整物品檔。
 import { SLOT_CODE } from '../engine/equip-slots.js';
 import { DyePalette } from './dye-palette.js';
-import { marketboardUrl, presetItems, slotCode, slotItems, slotMetadata } from './slot-data.js';
+import { inGameRestriction, marketboardUrl, presetItems, slotCode, slotItems, slotMetadata } from './slot-data.js';
 import { emptySummary, itemRow, wornSummary } from './slot-row.js';
+import { iconSVG } from './glamour-visual.js';
 
 export const SLOT_LABEL = { Head: '頭部', Top: '身體', Arms: '手部', Legs: '腿部', Feet: '腳部', Ear: '耳飾', Neck: '項鍊', Wrist: '手環', RFinger: '右手戒指', LFinger: '左手戒指' };
 const SLOT_BY_CODE = Object.fromEntries(Object.entries(SLOT_CODE).map(([slot, code]) => [code, slot]));
 const PAGE = 60;
+export function matchingEquipment(sorted, query, wearable, character, metadata) {
+  const named = query ? sorted.filter((item) => item.name.includes(query)) : sorted;
+  return wearable ? named.filter((item) => inGameRestriction(item, character, metadata).allowed !== false) : named;
+}
+
+export function outfitText(slots, worn, presets, blockedBy, stains, palette) {
+  return slots.map(([slot, label]) => {
+    const item = worn[slot] ?? presets[slot];
+    const name = blockedBy[slot] ? `${item?.name ?? '未穿戴'}（被${slots.find(([key]) => key === blockedBy[slot])?.[1] ?? '其他部位'}裝備遮住）` : item?.name ?? '未穿戴';
+    const dyes = item?.dye && stains[slot]
+      ? stains[slot].slice(0, Math.min(2, item.dye)).map((id, index) => `染劑 ${index + 1}：${palette.name(id)}`).join('、') : '';
+    return `${label}：${name}${dyes ? `｜${dyes}` : ''}`;
+  }).join('\n');
+}
 
 export class SlotPanel {
   /** deps＝{ view, stains, redraw(), status(text) } */
@@ -28,6 +43,10 @@ export class SlotPanel {
     this.presets = await presetItems();
     this.enabled = true;
     for (const slot of Object.keys(this.rows)) this.refresh(slot);
+    const copy = document.querySelector('#glamour-copy-outfit');
+    copy.disabled = false;
+    copy.removeAttribute('title');
+    copy.onclick = () => this.copyOutfit();
   }
 
   presetItem(slot) {
@@ -47,11 +66,12 @@ export class SlotPanel {
       <button type="button" class="codex-btn codex-btn--ghost glamour-slot-change" aria-expanded="false">更換</button>
     </div><p class="glamour-slot-error" role="alert" hidden></p>
     <div class="glamour-slot-picker" hidden>
-      <div class="glamour-slot-filters">
+      <div class="codex-toolbar" role="group" aria-label="裝備搜尋與排序">
         <label class="codex-field glamour-slot-search-field"><span class="codex-field__label">搜尋裝備名稱</span>
-          <input type="search" class="codex-input glamour-slot-q" placeholder="輸入裝備名稱"></label>
+          <span class="codex-search">${iconSVG('magnifying-glass', 'codex-search__icon')}<input type="search" class="codex-input glamour-slot-q" placeholder="輸入裝備名稱"></span></label>
         <label class="codex-field"><span class="codex-field__label">排序</span>
           <select class="codex-select glamour-slot-sort"><option value="new">新物品優先</option><option value="ilvl">物品等級高優先</option></select></label>
+        <button type="button" class="codex-chip glamour-slot-wearable" aria-pressed="false">只看可穿戴</button>
       </div>
       <div class="glamour-slot-results"></div>
       <div class="glamour-slot-picker-actions">
@@ -60,10 +80,11 @@ export class SlotPanel {
       </div>
     </div>`;
     const $ = (name) => element.querySelector(`.glamour-slot-${name}`);
-    const row = { el: element, item: $('worn'), dyes: $('dyes'), error: $('error'), picker: $('picker'), q: $('q'), sort: $('sort'), results: $('results'), change: $('change'), source: $('current-source'), items: null };
+    const row = { el: element, item: $('worn'), dyes: $('dyes'), error: $('error'), picker: $('picker'), q: $('q'), sort: $('sort'), wearable: $('wearable'), results: $('results'), change: $('change'), source: $('current-source'), items: null };
     row.change.addEventListener('click', () => this.togglePicker(slot));
     row.q.addEventListener('input', () => this.search(slot));
     row.sort.addEventListener('change', () => this.search(slot));
+    row.wearable.addEventListener('click', () => { row.wearable.setAttribute('aria-pressed', String(row.wearable.getAttribute('aria-pressed') !== 'true')); this.search(slot); });
     $('reset').addEventListener('click', () => this.wear(slot, null));
     return row;
   }
@@ -85,6 +106,9 @@ export class SlotPanel {
       row.source.setAttribute('aria-label', `${displayed.name}：到市場板查來源（共用分頁）`);
     }
     row.el.classList.toggle('is-changed', !!worn);
+    let changed = row.el.querySelector('.glamour-slot-changed');
+    if (worn && !changed) { changed = document.createElement('span'); changed.className = 'glamour-slot-changed codex-badge codex-badge--warn'; changed.textContent = '已更換'; row.item.append(changed); }
+    if (!worn) changed?.remove();
     row.change.disabled = !this.enabled || !!row.loading;
     row.change.title = this.enabled ? '' : '請先選擇遊戲資料夾。';
     const stains = this.view.stains[slot];
@@ -102,12 +126,14 @@ export class SlotPanel {
       button.addEventListener('click', () => this.palette.open(row.dyes, id, (pick) => {
         this.view.stains[slot][index] = pick;
         this.refresh(slot);
+        row.dyes.children[index]?.focus();
         this.redraw();
         this.onChange?.();
-      }, `${SLOT_LABEL[slot]}・染劑 ${index + 1}`));
+      }, `${SLOT_LABEL[slot]}・染劑 ${index + 1}`, button));
       return button;
     }));
     row.dyes.hidden = !count;
+    if (!row.picker.hidden && !row.loading && row.items && row.metadata) this.search(slot);
   }
 
   async togglePicker(slot) {
@@ -120,6 +146,7 @@ export class SlotPanel {
     row.picker.hidden = !opening;
     row.change.setAttribute('aria-expanded', String(opening));
     if (!opening) { this.palette.close(); return; }
+    row.error.hidden = true;
     row.results.textContent = '讀取這個部位的裝備中…';
     row.loading = true;
     this.refresh(slot);
@@ -146,13 +173,20 @@ export class SlotPanel {
     if (!row.items || !row.metadata) return;
     const q = row.q.value.trim();
     const sorted = row.sort.value === 'ilvl' ? row.sortedIlvl : row.sortedNew;
-    const hits = q ? sorted.filter((item) => item.name.includes(q)) : sorted;
+    const current = this.view.equipLayer?.body?.c;
+    const wearable = row.wearable.getAttribute('aria-pressed') === 'true';
+    const hits = matchingEquipment(sorted, q, wearable, current, row.metadata);
     row.shown = more ? row.shown + PAGE : PAGE;
     const count = document.createElement('p');
     count.className = 'glamour-slot-hint codex-small';
-    count.textContent = q ? `符合「${q}」：${hits.length} 件裝備` : `全部 ${hits.length} 件裝備，可輸入名稱篩選。`;
-    const current = this.view.equipLayer?.body?.c;
+    count.textContent = `${q ? `符合「${q}」` : '全部'}${wearable ? '（只看可穿戴與限制未明）' : ''}：${hits.length} 件裝備`;
     const results = hits.slice(0, row.shown).map((item) => itemRow(item, current, row.metadata, () => this.wear(slot, item)));
+    if (!hits.length) {
+      const empty = document.createElement('div');
+      empty.className = 'codex-empty codex-empty--bare';
+      empty.textContent = q ? `找不到符合「${q}」的裝備，請換個名稱或清除搜尋。` : '沒有符合目前篩選條件的裝備；請關閉「只看可穿戴」再試。';
+      results.push(empty);
+    }
     row.results.replaceChildren(count, ...results);
     if (hits.length > row.shown) {
       const next = document.createElement('button');
@@ -162,6 +196,18 @@ export class SlotPanel {
       next.addEventListener('click', () => this.search(slot, true));
       row.results.append(next);
     }
+  }
+
+  async copyOutfit() {
+    if (!this.enabled) return;
+    const presets = Object.fromEntries(Object.keys(this.rows).map((slot) => [slot, this.presetItem(slot)]));
+    const text = outfitText(Object.entries(SLOT_LABEL), this.worn, presets, this.blockedBy, this.view.stains, this.palette);
+    const status = document.querySelector('#glamour-copy-status');
+    let result = false;
+    try { result = await window.FFXIVClipboard.copy(text, '目前穿搭'); }
+    catch (error) { console.error('複製目前穿搭失敗', error); }
+    status.hidden = false;
+    status.textContent = result ? '已複製目前穿搭。' : '複製失敗，請檢查瀏覽器剪貼簿權限後再試。';
   }
 
   equipItem(item) {

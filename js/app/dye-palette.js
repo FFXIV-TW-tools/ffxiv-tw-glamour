@@ -16,7 +16,7 @@ export class DyePalette {
   color(id) { return id ? stainHex(this.byId.get(id)?.[2] ?? 0) : null; }
 
   /** 在 anchor 下方開面板；onPick(id)，id＝0 不染 */
-  open(anchor, current, onPick, title) {
+  open(anchor, current, onPick, title, trigger = anchor) {
     this.close();
     const el = document.createElement('div');
     el.className = 'glamour-dye-pop';
@@ -24,7 +24,7 @@ export class DyePalette {
     el.setAttribute('aria-label', title);
     const shade = this.byId.get(current)?.[3] ?? this.groups[0].shade;
     el.innerHTML = `<div class="glamour-dye-pop-head"><span>${title}</span><button type="button" class="codex-btn codex-btn--ghost glamour-dye-none">不染</button></div>
-      <div class="codex-tabs glamour-dye-tabs" role="group" aria-label="染劑色系">${this.groups.map(g => `<button type="button" class="codex-tab" data-shade="${g.shade}" aria-pressed="${g.shade === shade}">${g.label}</button>`).join('')}</div>
+      <div class="codex-tabs codex-tabs--boxed glamour-dye-tabs" role="group" aria-label="染劑色系">${this.groups.map(g => `<button type="button" class="codex-tab codex-tab--boxed" data-shade="${g.shade}" aria-pressed="${g.shade === shade}">${g.label}</button>`).join('')}</div>
       <div class="glamour-dye-grid" role="group" aria-label="染劑顏色"></div><div class="glamour-dye-name codex-small" aria-live="polite">${this.name(current)}</div>`;
     const grid = el.querySelector('.glamour-dye-grid'), label = el.querySelector('.glamour-dye-name');
     const show = (s) => {
@@ -38,6 +38,7 @@ export class DyePalette {
         b.setAttribute('aria-label', name);
         b.setAttribute('aria-pressed', String(id === current));
         b.addEventListener('mouseenter', () => { label.textContent = name; });
+        b.addEventListener('focus', () => { label.textContent = name; });
         b.addEventListener('click', () => { this.close(); onPick(id); });
         return b;
       }));
@@ -48,6 +49,7 @@ export class DyePalette {
     anchor.after(el);
     this.el = el;
     this.anchor = anchor;
+    this.trigger = trigger;
     // 點面板外面或按 Esc 關閉
     this.outside = (e) => { if (!el.contains(e.target) && e.target !== anchor) this.close(); };
     this.esc = (e) => { if (e.key === 'Escape') this.close(); };
@@ -61,5 +63,7 @@ export class DyePalette {
     this.el = null;
     document.removeEventListener('pointerdown', this.outside);
     document.removeEventListener('keydown', this.esc);
+    if (this.trigger?.isConnected) this.trigger.focus();
+    this.anchor = this.trigger = null;
   }
 }

@@ -67,7 +67,7 @@
   <header class="page-header">
     <h1 class="codex-h1"><span class="ph-icon" aria-hidden="true">👗</span>角色幻化預覽 <span class="sub codex-label codex-label--muted">FFXIV 繁中服</span></h1>
     <div class="glamour-header-tools">
-      <p id="status" class="codex-small" role="status">先選遊戲資料夾，即可預覽角色。</p>
+      <p id="status" class="codex-small" role="status">待選遊戲資料夾</p>
       <button type="button" id="notice-open" class="codex-btn codex-btn--ghost">使用須知</button>
     </div>
   </header>
@@ -75,39 +75,45 @@
   <main class="glamour-workspace" id="ftw-main">
     <section class="glamour-viewer codex-tablet codex-tablet--cyan" aria-label="角色幻化預覽畫面">
       <span class="codex-hud" aria-hidden="true"></span>
-      <canvas id="view" width="2560" height="1440" aria-label="可拖曳轉動及移動的角色預覽畫面"></canvas>
+      <canvas id="view" width="2560" height="1440" aria-label="角色預覽。左右拖曳轉動，上下拖曳移動；方向鍵也能操作，滾輪或放大控制可縮放。"></canvas>
       <div class="glamour-view-empty codex-empty codex-empty--bare" id="view-empty">
         <h2 class="codex-h2">在這裡預覽自己的角色</h2>
         <p class="codex-body codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn"><strong>必須在已安裝台服遊戲主程式的電腦上使用。</strong></p>
-        <p class="codex-body">先在右側選取台服遊戲資料夾，便能編輯外貌、更換裝備與染劑，並切換背景。</p>
+        <p class="codex-body">選擇電腦上的台服遊戲資料夾，即可預覽角色並調整外貌、裝備與染劑。</p>
+        <button type="button" class="codex-btn codex-btn--primary" id="glamour-start">選遊戲資料夾</button>
       </div>
       <div id="download" class="glamour-download codex-body" role="status" aria-live="polite" hidden></div>
+      <p id="glamour-view-error" class="glamour-view-error codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn codex-small" role="alert" hidden></p>
       <div class="glamour-view-controls codex-body" role="group" aria-label="背景、轉動與縮放">
         <div class="glamour-view-body" id="view-controls-body">
           <span>背景</span><div id="bundles" class="glamour-backgrounds" role="group" aria-label="選擇背景"></div>
           <label for="angle">轉動</label><input type="range" id="angle" min="-180" max="180" step="1" value="0" aria-label="轉動角度"><span class="glamour-value" id="angle-v">0°</span>
           <label for="zoom">縮放</label><input type="range" id="zoom" min="1" max="4" step="0.25" value="1" aria-label="放大倍數"><span class="glamour-value" id="zoom-v">1×</span>
-          <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left">⟲ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right">⟳ 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero">回正</button></div>
+          <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left">向左轉 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right">向右轉 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero">回正</button><button type="button" class="codex-btn codex-btn--ghost" id="glamour-refit">重設取景</button></div>
         </div>
+        <p class="glamour-controls-hint codex-small" id="glamour-controls-hint">選取遊戲資料夾後可切換背景與取景。</p>
         <button type="button" class="codex-btn codex-btn--ghost glamour-view-toggle" id="view-controls-toggle" aria-expanded="true" aria-controls="view-controls-body">收起</button>
       </div>
     </section>
     <aside class="glamour-sidebar" aria-label="角色設定及說明">
-      <section class="codex-tablet codex-tablet--cyan" id="guide">
+      <nav class="glamour-section-nav" aria-label="編輯區段"><a href="#guide">開始</a><a href="#look">外貌</a><a href="#slots-section">裝備與染劑</a></nav>
+      <section class="codex-tablet codex-tablet--cyan codex-glow" id="guide">
         <span class="codex-hud" aria-hidden="true"></span>
       </section>
       <section class="codex-tablet codex-tablet--cyan" id="look">
         <span class="codex-hud" aria-hidden="true"></span>
-        <h2 class="codex-h2">角色外貌</h2>
-        <div class="codex-empty codex-empty--bare">選好遊戲資料夾後，就能載入外貌存檔並調整角色。</div>
+        <h2 class="codex-view-title" id="look-placeholder-title"><span class="codex-view-title__ico" aria-hidden="true"></span>角色外貌</h2>
+        <div class="codex-empty codex-empty--bare">選好遊戲資料夾後，可載入外貌存檔或調整預設角色。</div>
       </section>
-      <section class="codex-tablet codex-tablet--cyan" aria-label="裝備與染劑">
+      <section class="codex-tablet codex-tablet--cyan" id="slots-section" aria-label="裝備與染劑">
         <span class="codex-hud" aria-hidden="true"></span>
-        <h2 class="codex-h2">裝備與染劑</h2>
+        <div class="glamour-slots-head"><h2 class="codex-view-title" id="slots-title"><span class="codex-view-title__ico" aria-hidden="true"></span>裝備與染劑</h2><button type="button" class="codex-btn codex-btn--ghost" id="glamour-copy-outfit" disabled title="預覽就緒後可複製目前穿搭">複製目前穿搭</button></div>
+        <p id="glamour-copy-status" class="codex-small" role="status" hidden></p>
         <div id="slots" class="codex-empty codex-empty--bare">選好遊戲資料夾後，就能更換裝備與染劑。</div>
       </section>
       <section class="codex-tablet codex-tablet--cyan">
         <span class="codex-hud" aria-hidden="true"></span>
+        <h3 class="codex-h3 codex-h3--section">使用與畫面資訊</h3>
         <div class="glamour-side-notice"><span class="codex-body">下載流量及畫面差異，請先閱讀使用須知。</span><button type="button" class="codex-btn codex-btn--ghost" id="notice-side-open">查看須知</button></div>
         <p id="gpu" class="codex-small" role="status"></p>
         <details class="codex-accordion glamour-differences"><summary>和遊戲不同的地方</summary><div class="codex-accordion__body"><p class="codex-body">此預覽不保證與遊戲畫面相同。臉部特徵尚未顯示；姿勢、部分衣服與皮膚的接縫、身體遮擋、髮尾與披風的擺動、半透明衣料及光影也可能不同。詳細說明請看「使用須知」。</p></div></details>
@@ -116,10 +122,11 @@
     </aside>
   </main>
 
-  <section class="glamour-mobile-notice codex-tablet codex-tablet--cyan" aria-labelledby="mobile-title">
+  <section class="glamour-mobile-notice codex-tablet codex-tablet--cyan" aria-label="使用限制">
     <span class="codex-hud" aria-hidden="true"></span>
     <h2 class="codex-h2" id="mobile-title">請使用電腦開啟角色幻化預覽</h2>
-    <p class="codex-body">手機與平板目前無法使用此工具。必須在已安裝台服遊戲主程式、有圖形加速功能的電腦上，使用桌面版 Chrome 開啟本頁，並選取你自己的台服遊戲資料夾。</p>
+    <p class="codex-body">請在已安裝台服遊戲主程式且開啟圖形加速的電腦上，以桌面版 Chrome 或 Edge 使用。</p>
+    <div class="glamour-window-notice"><h2 class="codex-h2">請放大瀏覽器視窗</h2><p class="codex-body">角色預覽需要至少 1021px 的視窗寬度；放大視窗後即可繼續。</p></div>
   </section>
 
   <div class="codex-modal-overlay" id="notice" hidden>
@@ -159,7 +166,7 @@
       <div class="codex-modal__body codex-body">
         <p>重新開啟網頁後，瀏覽器不能自動讀取電腦上的遊戲檔案，目前畫面使用的是上次保存的資料。要換裝、調整外貌或改用還沒用過的背景，請再選一次台服遊戲資料夾。</p>
         <p>如果視窗已停在你的遊戲資料夾，直接按視窗裡的「上傳」，Chrome 再問一次時也按「上傳」；檔案只在這個瀏覽器裡讀取，不會上傳。</p>
-        <p id="folder-prompt-resume" hidden></p>
+        <p id="folder-prompt-resume" class="codex-tint-panel codex-tint-panel--bar" hidden></p>
       </div>
       <div class="codex-modal__footer"><button type="button" class="codex-btn codex-btn--ghost" id="folder-prompt-cancel">取消</button><button type="button" class="codex-btn codex-btn--primary" id="folder-prompt-pick">選遊戲資料夾</button></div>
     </div>

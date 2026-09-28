@@ -1,0 +1,5 @@
+{
+  "out": "js/app/glamour-icons.js",
+  "format": "esm",
+  "used": ["folder-open", "user-circle", "sword", "magnifying-glass", "copy", "arrow-counter-clockwise", "arrow-clockwise"]
+}

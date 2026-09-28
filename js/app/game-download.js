@@ -153,18 +153,23 @@ export class DownloadPanel {
       // 預估剩餘：用目前平均速度推。包裡先下載的是幾百個小檔、位元組增加很慢，太早估會暴衝到幾百秒
       // （2026-09-27 實測 100 Mbps：前 7 秒估 193→871 秒，實際 16–24 秒）→ 下載超過 10% 才估，之前顯示「估算中」
       const eta = item.total && item.loaded >= item.total * 0.1 && item.total > item.loaded ? (elapsed * (item.total - item.loaded)) / item.loaded : null;
+      const progress = item.total
+        ? `<div class="codex-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}" aria-label="網站資料下載進度"><div class="codex-progress__bar" style="width:${pct.toFixed(1)}%"></div></div>`
+        : '<div class="codex-progress codex-progress--indeterminate" role="progressbar" aria-label="網站資料下載進度"><div class="codex-progress__bar"></div></div>';
       return `<p class="glamour-dl-title">背景「${name}」資料準備中</p>
-        <div class="codex-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}" aria-label="網站資料下載進度"><div class="codex-progress__bar" style="width:${pct.toFixed(1)}%"></div></div>
-        <p class="glamour-dl-line">網站資料 ${mb(item.loaded)} / ${item.total ? mb(item.total) : '大小未知'}（${pct.toFixed(0)}%）｜檔案 ${item.doneFiles}/${item.files || '?'}</p>
-        <p class="glamour-dl-line">本機遊戲資料 ${mb(item.clientLoaded)} / ${mb(item.clientTotal)}｜已驗證 ${item.clientDone}/${item.clientFiles} 份（SHA-256）</p>
+        <p class="glamour-dl-line"><strong>網站資料</strong> ${mb(item.loaded)} / ${item.total ? mb(item.total) : '大小未知'}${item.total ? `（${pct.toFixed(0)}%）` : ''}｜檔案 ${item.doneFiles}/${item.files || '?'}</p>${progress}
+        <p class="glamour-dl-line"><strong>本機遊戲資料</strong> ${mb(item.clientLoaded)} / ${item.clientTotal ? mb(item.clientTotal) : '大小未知'}｜已驗證 ${item.clientDone}/${item.clientFiles || '?'} 份（SHA-256）</p>
         <p class="glamour-dl-line">已過 ${sec(elapsed)}｜${eta != null ? `網站資料約剩 ${sec(eta)}` : '網站資料剩餘時間估算中'}${item.cachedBytes ? `｜其中 ${mb(item.cachedBytes)} 來自這台電腦的快取` : ''}</p>`;
     }
     if (item.phase === 'compile') {
       const c = item.compile;
       const pct = c?.total ? (c.done / c.total) * 100 : 0;
-      return `<p class="glamour-dl-title">背景「${name}」資料已就緒，準備著色器</p>
-        <div class="codex-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}" aria-label="畫面準備進度"><div class="codex-progress__bar" style="width:${pct.toFixed(1)}%"></div></div>
-        <p class="glamour-dl-line">網站資料 ${mb(item.loaded || item.total)}／本機遊戲資料 ${mb(item.clientLoaded)}｜著色器 ${c ? `${c.done}/${c.total}` : '準備中'}｜已過 ${sec(performance.now() - item.compileStartedAt)}</p>
+      const progress = c?.total
+        ? `<div class="codex-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}" aria-label="畫面準備進度"><div class="codex-progress__bar" style="width:${pct.toFixed(1)}%"></div></div>`
+        : '<div class="codex-progress codex-progress--indeterminate" role="progressbar" aria-label="畫面準備進度"><div class="codex-progress__bar"></div></div>';
+      return `<p class="glamour-dl-title">背景「${name}」資料已就緒</p>
+        <p class="glamour-dl-line"><strong>網站資料</strong> ${mb(item.loaded || item.total)}｜<strong>本機遊戲資料</strong> ${mb(item.clientLoaded)}</p>
+        <p class="glamour-dl-line"><strong>準備畫面</strong> 著色器 ${c?.total ? `${c.done}/${c.total}` : '準備中'}｜已過 ${sec(performance.now() - item.compileStartedAt)}</p>${progress}
         <p class="glamour-dl-hint">第一次畫這個背景要先編譯遊戲的著色器，之後轉動、換裝都很快。</p>`;
     }
     return '';

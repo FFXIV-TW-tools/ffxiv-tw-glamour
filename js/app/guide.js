@@ -1,5 +1,6 @@
 import { REQUIRED_PACKS } from '../game/client-packs.js';
-import { initNotices } from './guide-notice.js';
+import { initNotices, noticesAcknowledged } from './guide-notice.js';
+import { iconSVG } from './glamour-visual.js';
 
 const DEFAULT_PATH = 'C:\\Program Files\\USERJOY GAMES\\FINAL FANTASY XIV TC';
 // 這個瀏覽器曾用「選遊戲資料夾」成功讀取過；Chrome 會記住上次選的資料夾（整個瀏覽器共用）。
@@ -22,18 +23,18 @@ export class Guide {
     this.root.innerHTML = `
       <span class="codex-hud" aria-hidden="true"></span>
       <div class="glamour-guide-head">
-        <span class="codex-label">開始預覽</span>
+        <h2 class="codex-view-title"><span class="codex-view-title__ico" aria-hidden="true">${iconSVG('folder-open')}</span>開始預覽</h2>
         <p id="guide-next" class="codex-body" role="status">下一步：選擇電腦上的台服遊戲資料夾。</p>
         <p class="codex-body codex-tint-panel codex-tint-panel--bar codex-tint-panel--warn"><strong>必須在已安裝台服遊戲主程式的電腦上使用。</strong>本工具讀取你電腦上的遊戲檔案來顯示角色，沒有安裝遊戲就無法使用。</p>
       </div>
       <ol class="codex-steps" id="guide-steps" aria-label="開始使用的步驟">
         <li class="codex-step is-current" aria-current="step" data-guide-step="folder"><span class="codex-step__mark" aria-hidden="true"></span><span class="codex-step__body"><span class="codex-step__title">選遊戲資料夾</span><span class="codex-step__hint">在本機讀取遊戲資料</span></span></li>
-        <li class="codex-step" data-guide-step="save"><span class="codex-step__mark" aria-hidden="true"></span><span class="codex-step__body"><span class="codex-step__title">載入外貌存檔</span><span class="codex-step__hint">建議</span></span></li>
+        <li class="codex-step" data-guide-step="save"><span class="codex-step__mark" aria-hidden="true"></span><span class="codex-step__body"><span class="codex-step__title">載入外貌存檔</span><span class="codex-step__hint">建議，可略過</span></span></li>
         <li class="codex-step" data-guide-step="adjust"><span class="codex-step__mark" aria-hidden="true"></span><span class="codex-step__body"><span class="codex-step__title">調整角色</span><span class="codex-step__hint">外貌、裝備與背景</span></span></li>
       </ol>
       <div id="guide-detail">
         <section class="glamour-guide-part" aria-labelledby="guide-folder-title">
-          <h2 class="codex-h3" id="guide-folder-title">1．選遊戲資料夾</h2>
+          <h3 class="codex-h3 codex-h3--section" id="guide-folder-title">選遊戲資料夾</h3>
           <p id="data-state" class="codex-body">請選擇台服遊戲資料夾。遊戲檔案只在這個瀏覽器裡讀取，不會上傳。</p>
           <p class="codex-body" id="guide-default-intro">多數玩家的遊戲安裝在預設位置：</p>
           <div class="glamour-path"><code class="codex-code" id="guide-path"></code><button type="button" class="codex-btn codex-btn--ghost codex-small" id="guide-copy">複製路徑</button></div>
@@ -51,7 +52,7 @@ export class Guide {
           </details>
         </section>
         <section class="glamour-guide-part" aria-labelledby="guide-save-title">
-          <h2 class="codex-h3" id="guide-save-title">2．載入外貌存檔（建議）</h2>
+          <h3 class="codex-h3 codex-h3--section" id="guide-save-title">載入外貌存檔</h3>
           <p class="codex-body">想預覽自己的角色，請先在遊戲裡保存外貌，再到這裡匯入：</p>
           <ol class="codex-body glamour-guide-howto">
             <li>在遊戲裡到「美容師」或角色製作畫面保存外貌（遊戲稱為「角色設定資料」）。遊戲會在「文件\\My Games\\FINAL FANTASY XIV - TC」產生 <code class="codex-code">FFXIV_CHARA_01.dat</code> 這類檔案，尾端數字對應保存欄位。</li>
@@ -62,12 +63,12 @@ export class Guide {
           <p class="codex-small">若略過，會先顯示遊戲的預設角色；之後也可以在「角色外貌」載入外貌存檔。</p>
         </section>
         <section class="glamour-guide-part" aria-labelledby="guide-adjust-title">
-          <h2 class="codex-h3" id="guide-adjust-title">3．調整角色</h2>
+          <h3 class="codex-h3 codex-h3--section" id="guide-adjust-title">調整角色</h3>
           <p class="codex-body">編輯外貌、更換裝備與染劑；在預覽畫面左右拖曳可轉動，上下拖曳可移動，滾輪可放大或縮小。也能切換室內、乙太空間、海岸、森林、荒野 5 種背景。</p>
           <button type="button" class="codex-btn codex-btn--ghost" id="guide-done" disabled data-help="請先選好遊戲資料夾，才能開始調整角色。">我知道了，開始調整</button>
         </section>
       </div>
-      <div id="guide-summary" class="glamour-guide-summary" hidden><span id="guide-summary-state">已準備好預覽；可隨時更換遊戲資料夾或載入外貌存檔。</span><button type="button" class="codex-btn codex-btn--ghost" id="guide-summary-pick" hidden>選遊戲資料夾</button><button type="button" class="codex-btn codex-btn--ghost" id="guide-expand">查看步驟</button></div>`;
+      <div id="guide-summary" class="glamour-guide-summary" hidden><span id="guide-summary-state">預覽已就緒</span><button type="button" class="codex-btn codex-btn--ghost" id="guide-summary-pick" hidden>選遊戲資料夾</button><button type="button" class="codex-btn codex-btn--ghost" id="guide-expand">查看步驟</button></div>`;
     this.root.querySelector('#guide-path').textContent = DEFAULT_PATH;
     this.root.querySelector('#guide-packs').textContent = REQUIRED_PACKS.join('、');
     this.root.querySelector('#guide-copy').addEventListener('click', () => window.FFXIVClipboard?.copy(DEFAULT_PATH, '遊戲安裝路徑'));
@@ -80,6 +81,7 @@ export class Guide {
     this.root.querySelector('#guide-done').addEventListener('click', () => this.finish());
     this.root.querySelector('#guide-summary-pick').addEventListener('click', () => this.root.querySelector('#pick').click());
     this.root.querySelector('#guide-expand').addEventListener('click', () => {
+      this.root.classList.remove('is-complete');
       this.root.querySelector('#guide-detail').hidden = false;
       this.root.querySelector('#guide-steps').hidden = false;
       this.root.querySelector('#guide-summary').hidden = true;
@@ -121,6 +123,9 @@ export class Guide {
       if (ready) button.removeAttribute('data-help');
     }
     const pick = this.root.querySelector('#pick');
+    const canChoose = noticesAcknowledged() && stage !== 'loading';
+    pick.disabled = !canChoose;
+    this.root.querySelector('#files').disabled = !canChoose;
     const save = this.root.querySelector('#guide-save');
     pick.classList.toggle('codex-btn--primary', stage === 'folder' || stage === 'loading');
     pick.classList.toggle('codex-btn--ghost', stage !== 'folder' && stage !== 'loading');
@@ -132,16 +137,18 @@ export class Guide {
     this.previousStage = this.stage;
     this.setStage('loading');
     this.root.querySelector('#data-state').textContent = '正在讀取選取的遊戲資料，請稍候。';
+    document.querySelector('#view-empty').hidden = true;
   }
   cachedReady(look, version) {
     this.look = look;
     this.cached = true;
-    this.root.querySelector('#guide-summary-state').textContent = `已使用上次的遊戲資料（遊戲版本 ${version}）；調整外貌或換裝前請選遊戲資料夾。`;
+    this.root.querySelector('#guide-summary-state').textContent = '上次的預覽已還原；可轉動／縮放，調整外貌或換裝需重新選遊戲資料夾。';
     this.root.querySelector('#guide-summary-pick').hidden = false;
     this.compactFolder(true);
     this.root.querySelector('#data-state').textContent = `已使用上次的遊戲資料（遊戲版本 ${version}）。要調整外貌或換裝，請先選遊戲資料夾。`;
     document.querySelector('#view-empty').hidden = true;
     this.setStage('adjust');
+    this.finish();
   }
   /** 用上次保存的資料時被擋的操作：在原處開說明視窗，不把側欄捲到資料夾按鈕。 */
   cachedPrompt({ resumeText = '', onCancel = null } = {}) {
@@ -169,9 +176,10 @@ export class Guide {
     this.look = look;
     this.cached = false;
     this.root.querySelector('#guide-summary-pick').hidden = true;
-    this.root.querySelector('#guide-summary-state').textContent = '已準備好預覽；可隨時更換遊戲資料夾或載入外貌存檔。';
+    this.root.querySelector('#guide-summary-state').textContent = '預覽已就緒';
     if (this.pickedFolder) localStorage.setItem(PICKED_KEY, 'yes');
     this.root.querySelector('#data-state').textContent = '已讀取遊戲資料。建議載入外貌存檔，預覽自己的角色；也可以略過。';
+    this.root.classList.remove('is-complete');
     this.compactFolder(true);
     this.root.querySelector('#guide-detail').hidden = false;
     this.root.querySelector('#guide-steps').hidden = false;
@@ -181,6 +189,7 @@ export class Guide {
   }
   packsFailed(message) {
     this.root.querySelector('#data-state').textContent = `讀取失敗：${message}。請重新選擇遊戲資料夾。`;
+    this.root.classList.remove('is-complete');
     if (this.look) {
       this.root.querySelector('#guide-detail').hidden = false;
       this.root.querySelector('#guide-steps').hidden = false;
@@ -196,6 +205,7 @@ export class Guide {
   completeSave() { if (this.look) this.advanceAdjust(); }
   finish() {
     if (!this.look) return;
+    this.root.classList.add('is-complete');
     this.setStage('done');
     this.root.querySelector('#guide-detail').hidden = true;
     this.root.querySelector('#guide-steps').hidden = true;
