@@ -1,7 +1,8 @@
 // 背景包的網路下載、Cache Storage 預載與虛擬檔位元組。
 import { verifiedClientBytes } from './client-files.js';
 // 本機 serve.py 不做 HTTP 壓縮；包內 .bin.gz 是原位元組 gzip 封裝，不可當作遊戲原格式直接上傳 GPU。
-// DecompressionStream 只在 .gz 檔名使用；瀏覽器若由 HTTP Content-Encoding 先解壓會造成雙重解壓，公開站應以 application/octet-stream 提供。
+// DecompressionStream 只在 .gz 檔名使用；瀏覽器若由 HTTP Content-Encoding 先解壓會造成雙重解壓，公開站不得對 .gz 加 Content-Encoding
+// （背景資料 Pages 專案以 application/gzip 原位元組提供、不加 Content-Encoding，2026-09-28 實測含 br／gzip 請求）。
 export const fetchBytes = async (url) => {
   const r = await fetch(url, { cache: 'no-store' });
   if (!r.ok) throw new Error(`${url} ${r.status}`);

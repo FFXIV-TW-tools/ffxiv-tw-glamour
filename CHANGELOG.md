@@ -1,5 +1,11 @@
 # 更新紀錄
 
+## 2026-09-28 — 背景資料改由 Pages 提供
+
+- 背景資料由 R2 遷到獨立的 Pages 專案 `ffxiv-tw-glamour-data`（網域 `glamour-data.xivtc.com` 改為灰雲），網址不變。台灣連線由 SJC 改走 KHH：正式站室內背景下載 39 → 8.6 秒、海岸 51 → 10 秒。
+- `tools/upload-bundles.mjs` 改為 Pages 直接上傳（`--deploy`，整批原子切換）；`_headers` 只放行正式站 CORS、blob 長快取，附 robots／index／404；刪除 `tools/r2-cors.json`。R2 bucket 保留作退路至 2026-10-05（BACKLOG B-010）。
+- `robots.txt` 的 AI 爬蟲封鎖清單隨 portal 擴充為 175 個 UA。
+
 ## 2026-09-28 — 初版上線（https://glamour.xivtc.com/）
 
 - 建立角色幻化預覽公開頁面：選取本機台服遊戲資料、可略過的外貌存檔載入、裝備與染劑調整、5 種背景切換與操作引導。

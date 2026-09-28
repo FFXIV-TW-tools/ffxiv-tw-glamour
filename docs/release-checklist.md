@@ -13,14 +13,15 @@
 ## GitHub、Cloudflare 與背景資產
 
 - [x] 公開 repo `FFXIV-TW-tools/ffxiv-tw-glamour`，一律以 `bash ~/.claude/skills/process/tools/safe-push.sh --repo C:/FFXIVProject/external/ffxiv-tw-glamour --reason "<原因>"` 推送（canonicalTest 由 repo 根 `devloop.json` 宣告）。
-- [x] R2 bucket `ffxiv-tw-glamour-data`：CORS 只允許 `https://glamour.xivtc.com` 與 `https://ffxiv-tw-glamour.pages.dev` 的 GET／HEAD（`tools/r2-cors.json`）；自訂網域 `glamour-data.xivtc.com`。R2 自訂網域一定經 Cloudflare 代理，不適用 Pages 的灰雲規則。
-- [x] 背景上傳：`node tools/upload-bundles.mjs --from tmp/bundles --upload --jobs 6`（內容檔 → 各背景 manifest → index.json）。上線時全部 4,904 個網址回 200 且大小相符；二進位檔即使要求壓縮也不會帶 `content-encoding`。
-  - 已知：416 個沒帶雜湊檔名的 `.bin.gz` 被網域層的瀏覽器快取設定蓋成 `max-age=14400`（見 BACKLOG B-008）。
+- [x] 背景資料 Pages 專案 `ffxiv-tw-glamour-data`（直接上傳、不接 git）：`node tools/upload-bundles.mjs --from tmp/bundles --deploy`。`_headers` 只放行 `https://glamour.xivtc.com` 的 CORS、`/:bundle/blob/*` 設 immutable、其餘沿用 Pages 預設 `max-age=0, must-revalidate`；附 `robots.txt`（全擋）、`index.html`、`404.html`。
+  - 2026-09-28 於 `ffxiv-tw-glamour-data.pages.dev` 驗：4,904 檔全部 200 且大小相符、`.gz` 以 `application/gzip` 原位元組提供且帶 br／gzip 請求也無 `Content-Encoding`、CORS 正確、缺檔回 404。20 MB 檔下載 KHH 19–26 MB/s（原 R2 經 SJC 5–7 MB/s）。
+  - 初版曾用 R2 bucket `ffxiv-tw-glamour-data`（橘雲、SJC）；bucket 保留作退路，預定 2026-10-05 刪除（BACKLOG B-010）。
+- [x] 網域切換（2026-09-28）：Owner 移除 R2 自訂網域、新增灰雲 CNAME `glamour-data` → `ffxiv-tw-glamour-data.pages.dev`；Pages 專案網域驗證通過。驗：4,904 檔經 `glamour-data.xivtc.com` 全部 200、大小相符、無 `Content-Encoding`、CORS 正確、全數 KHH；網域路由哨兵 16/16 ✓（已加 `glamour-data`）；正式站室內背景下載 8.6 秒（R2 時 39 秒）、海岸 10 秒（R2 時 51 秒），主控台 0 錯誤。
 - [x] Cloudflare Pages 專案接 GitHub repo：build command `sh deploy-prepare.sh`；build output directory `_site`；root directory 留空。Functions → Bindings 已設 `SETTINGS_API` → `ffxiv-tw-tools-settings-api`（`/settings-api/health` 200）。線上 CSP、HSTS、`X-Frame-Options`、`nosniff`、`Referrer-Policy`、`Permissions-Policy` 皆在。
 - [x] Pages custom domain `glamour.xivtc.com`，DNS CNAME 灰雲（DNS-only）；`tools/check-domain-routing.sh` 的 `PAIRS` 已加，哨兵為 ✓（172.66 池、憑證有效、內容一致）。
-- [ ] 舊網址轉址：`ffxiv-tw-glamour.pages.dev` 目前直接回 200，其他站的 pages.dev 都經帳號層 Bulk Redirects 301 到正式網域。**Owner**：在 Cloudflare 帳號層 Bulk Redirects 清單加一列 `ffxiv-tw-glamour.pages.dev` → `https://glamour.xivtc.com`。
+- [x] 舊網址轉址：`ffxiv-tw-glamour.pages.dev` 經帳號層 Bulk Redirects 301 到 `https://glamour.xivtc.com/`（2026-09-28 實測）。
 - [x] 線上 `robots.txt`（AI 爬蟲封鎖清單與 portal 一致）、`sitemap.xml`、`favicon.svg`／`favicon-192.png`／`favicon.ico`（與 portal 同一份）；`/AGENTS.md`、`/docs/release-checklist.md`、`/tools/upload-bundles.mjs` 只會回首頁，拿不到原檔；`check-deploy-surface.sh` 為部署面乾淨。
-- [ ] **Owner**：Google Search Console 提交 `https://glamour.xivtc.com/sitemap.xml` 並要求建立索引。
+- [x] Google Search Console 已提交 `https://glamour.xivtc.com/sitemap.xml`（Owner 2026-09-28）。
 
 ## Portal 串接
 
