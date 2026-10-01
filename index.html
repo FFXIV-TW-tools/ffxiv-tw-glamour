@@ -29,7 +29,8 @@
 <!-- settings-client.js：暴露 window.FFXIVSettings（Discord webhook / 全域偏好 SDK，navbar ⚙ 用） -->
 <!-- ⚠ document.write 為唯一標準寫法：parser-inserted defer 保證執行順序。不可改 createElement
      （動態插入 script 的 defer 被忽略當 async → 順序不保證 → FFXIVSettings 晚 ready）。
-     error boundary 不用自帶 — header.js 已中央化。長時開 tab 的工具加掛 version-check.js。 -->
+     error boundary 不用自帶 — header.js 已中央化。長時開 tab 的工具加掛 version-check.js。
+     usage.js＝使用統計（portal docs/specs/2026-10-01-usage-analytics-design.md）；_headers connect-src 要放行它的 Worker。 -->
 <script>(function(){
   var dev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   var base = dev ? 'http://localhost:8774/ffxiv-tw-tools-portal/' : 'https://xivtc.com/';
@@ -37,6 +38,7 @@
     '<link rel="stylesheet" href="' + base + 'tokens.css">' +
     '<link rel="stylesheet" href="' + base + 'header.css">' +
     '<script defer src="' + base + 'header.js"><\/script>' +
+    '<script defer src="' + base + 'usage.js"><\/script>' +
     '<script defer src="' + base + 'settings-client.js"><\/script>'
   );
 })();</script>
