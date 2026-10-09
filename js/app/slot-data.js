@@ -44,10 +44,14 @@ export function iconUrl(icon) {
   return `https://v2.xivapi.com/api/asset/ui/icon/${folder}/${id.padStart(6, '0')}_hr1.tex?format=png`;
 }
 
+/**
+ * 市場板物品頁網址；由 portal `header.js` 的 `FFXIVTools.link` 集中提供，render 當下才呼叫。
+ * @param {number} id
+ * @returns {string | null} 共用元件沒載到時為 null，呼叫端不長連結
+ */
 export function marketboardUrl(id) {
-  const base = ['localhost', '127.0.0.1'].includes(location.hostname)
-    ? 'http://localhost:8774/ffxiv-tw-marketboard/' : 'https://market.xivtc.com/';
-  return `${base}#/item/${id}`;
+  const tools = /** @type {{ FFXIVTools?: { link?: (slug: string, kind?: string, params?: Record<string, string | number>) => string | null } }} */ (/** @type {unknown} */ (globalThis)).FFXIVTools;
+  return tools?.link?.('tw-marketboard', 'item', { id }) ?? null;
 }
 
 export function inGameRestriction(item, character, metadata) {

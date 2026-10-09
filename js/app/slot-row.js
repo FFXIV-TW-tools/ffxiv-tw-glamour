@@ -68,10 +68,13 @@ export function itemRow(item, character, metadata, onWear) {
   }
   body.append(content);
   wrap.append(body);
-  const link = el('a', 'glamour-slot-source codex-small', '查來源 →');
-  link.href = marketboardUrl(item.id);
-  link.target = 'ffxiv-marketboard';
-  link.setAttribute('aria-label', `${item.name}：到市場板查來源（共用分頁）`);
-  wrap.append(link);
+  const sourceUrl = marketboardUrl(item.id);
+  if (sourceUrl) {
+    const link = el('a', 'glamour-slot-source codex-small', '查來源 →');
+    link.href = sourceUrl;
+    link.target = 'ffxiv-marketboard';
+    link.setAttribute('aria-label', `${item.name}：到市場板查來源（共用分頁）`);
+    wrap.append(link);
+  }
   return wrap;
 }

@@ -100,9 +100,10 @@ export class SlotPanel {
     else if (this.blockedBy[slot]) row.item.replaceChildren(emptySummary(`被${SLOT_LABEL[this.blockedBy[slot]]}的裝備遮住。`));
     else if (displayed?.id && metadata) row.item.replaceChildren(wornSummary(displayed, current, metadata));
     else row.item.replaceChildren(emptySummary(displayed?.name ?? '未穿戴裝備'));
-    row.source.hidden = !displayed?.id;
-    if (displayed?.id) {
-      row.source.href = marketboardUrl(displayed.id);
+    const sourceUrl = displayed?.id ? marketboardUrl(displayed.id) : null;
+    row.source.hidden = !sourceUrl;
+    if (sourceUrl) {
+      row.source.href = sourceUrl;
       row.source.setAttribute('aria-label', `${displayed.name}：到市場板查來源（共用分頁）`);
     }
     row.el.classList.toggle('is-changed', !!worn);
