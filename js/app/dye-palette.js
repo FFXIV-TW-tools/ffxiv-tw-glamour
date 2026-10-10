@@ -23,7 +23,7 @@ export class DyePalette {
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-label', title);
     const shade = this.byId.get(current)?.[3] ?? this.groups[0].shade;
-    el.innerHTML = `<div class="glamour-dye-pop-head"><span>${title}</span><button type="button" class="codex-btn codex-btn--ghost glamour-dye-none">不染</button></div>
+    el.innerHTML = `<div class="glamour-dye-pop-head"><span>${title}</span><button type="button" class="codex-btn codex-btn--ghost glamour-dye-none" data-track="clear-dye">不染</button></div>
       <div class="codex-tabs codex-tabs--boxed glamour-dye-tabs" role="group" aria-label="染劑色系">${this.groups.map(g => `<button type="button" class="codex-tab codex-tab--boxed" data-shade="${g.shade}" aria-pressed="${g.shade === shade}">${g.label}</button>`).join('')}</div>
       <div class="glamour-dye-grid" role="group" aria-label="染劑顏色"></div><div class="glamour-dye-name codex-small" aria-live="polite">${this.name(current)}</div>`;
     const grid = el.querySelector('.glamour-dye-grid'), label = el.querySelector('.glamour-dye-name');
@@ -33,6 +33,8 @@ export class DyePalette {
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'glamour-dye-swatch';
+        b.dataset.track = 'pick-dye';
+        b.dataset.trackLabel = '選取染劑';
         b.style.background = stainHex(rgb);
         b.title = name;
         b.setAttribute('aria-label', name);

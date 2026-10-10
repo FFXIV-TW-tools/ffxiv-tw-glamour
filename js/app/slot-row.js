@@ -40,6 +40,8 @@ export function itemRow(item, character, metadata, onWear) {
   const body = el(onWear ? 'button' : 'div', 'glamour-slot-item-body');
   if (onWear) {
     body.type = 'button';
+    body.dataset.track = 'wear-equipment';
+    body.dataset.trackLabel = '預覽裝備';
     body.addEventListener('click', onWear);
     body.setAttribute('aria-label', `預覽裝備：${item.name}`);
   }
@@ -73,6 +75,8 @@ export function itemRow(item, character, metadata, onWear) {
     const link = el('a', 'glamour-slot-source codex-small', '查來源 →');
     link.href = sourceUrl;
     link.target = 'ffxiv-marketboard';
+    link.dataset.track = 'equipment-source';
+    link.dataset.trackLabel = '查裝備來源';
     link.setAttribute('aria-label', `${item.name}：到市場板查來源（共用分頁）`);
     wrap.append(link);
   }

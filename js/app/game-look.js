@@ -4,6 +4,7 @@ import { charamake, choicePath, colourPalette, invalidOptions } from './look-edi
 import { LookEditor } from './look-editor.js';
 import { iconSVG } from './glamour-visual.js';
 
+const usageWindow = /** @type {Window & { XivUsage?: { track(name: string): void } }} */ (window);
 const $ = (root, selector) => root.querySelector(selector);
 /** 缺少玩家本機遊戲資料不是暫時性錯誤；將引擎路徑轉成可行的使用者提示。 */
 function appearanceFailure(error) {
@@ -29,8 +30,8 @@ export class LookPanel {
       <span id="look-edited" class="codex-badge codex-badge--warn" hidden>已調整</span>
     </div>
     <div class="glamour-look-actions">
-      <button id="look-pick" type="button" class="codex-btn codex-btn--ghost">載入外貌存檔</button>
-      <button id="look-reset" type="button" class="codex-btn codex-btn--ghost">恢復預設角色</button>
+      <button id="look-pick" type="button" class="codex-btn codex-btn--ghost" data-track="load-look-save">載入外貌存檔</button>
+      <button id="look-reset" type="button" class="codex-btn codex-btn--ghost" data-track="reset-look">恢復預設角色</button>
       <input id="look-file" type="file" accept=".dat" hidden>
     </div>
     <div id="look-error" class="codex-tint-panel codex-tint-panel--warn" role="status" hidden></div>
@@ -163,6 +164,7 @@ export class LookPanel {
     if (!this.races.races.some(([id]) => id === race) ||
         !this.races.tribes.some(([id]) => id === clan) ||
         Math.ceil(clan / 2) !== race || ![0, 1].includes(gender)) return;
+    usageWindow.XivUsage && usageWindow.XivUsage.track('edit-look');
     this.editor.disabled(true);
     try {
       const c = { ...await this.view.defaultLook(raceCode(race, clan, gender)), race, clan, gender };
@@ -177,6 +179,7 @@ export class LookPanel {
   async change(field, value) {
     if (this.busy || !this.look || Object.is(this.look[field], value)) return;
     if (this.canEdit && !this.canEdit()) { this.needFolder(); return; }
+    usageWindow.XivUsage && usageWindow.XivUsage.track('edit-look');
     await this.apply({ ...this.look, [field]: value }, this.loaded?.fileName ?? null);
   }
 

@@ -63,20 +63,20 @@ export class SlotPanel {
       <strong class="glamour-slot-label">${SLOT_LABEL[slot]}</strong>
       <div class="glamour-slot-worn"></div>
       <div class="glamour-slot-dyes" role="group" aria-label="${SLOT_LABEL[slot]}染劑"></div>
-      <button type="button" class="codex-btn codex-btn--ghost glamour-slot-change" aria-expanded="false">更換</button>
+      <button type="button" class="codex-btn codex-btn--ghost glamour-slot-change" aria-expanded="false" data-track="open-equipment-picker" data-track-label="更換裝備部位">更換</button>
     </div><p class="glamour-slot-error" role="alert" hidden></p>
     <div class="glamour-slot-picker" hidden>
       <div class="codex-toolbar" role="group" aria-label="裝備搜尋與排序">
         <label class="codex-field glamour-slot-search-field"><span class="codex-field__label">搜尋裝備名稱</span>
           <span class="codex-search">${iconSVG('magnifying-glass', 'codex-search__icon')}<input type="search" class="codex-input glamour-slot-q" placeholder="輸入裝備名稱"></span></label>
         <label class="codex-field"><span class="codex-field__label">排序</span>
-          <select class="codex-select glamour-slot-sort"><option value="new">新物品優先</option><option value="ilvl">物品等級高優先</option></select></label>
-        <button type="button" class="codex-chip glamour-slot-wearable" aria-pressed="false">只看可穿戴</button>
+          <select class="codex-select glamour-slot-sort" data-track="sort-equipment" data-track-label="裝備排序"><option value="new">新物品優先</option><option value="ilvl">物品等級高優先</option></select></label>
+        <button type="button" class="codex-chip glamour-slot-wearable" aria-pressed="false" data-track="filter-wearable">只看可穿戴</button>
       </div>
       <div class="glamour-slot-results"></div>
       <div class="glamour-slot-picker-actions">
-        <button type="button" class="codex-btn codex-btn--ghost glamour-slot-reset">恢復預設服裝</button>
-        <a class="glamour-slot-current-source codex-small" target="ffxiv-marketboard" hidden>目前裝備：查來源 →</a>
+        <button type="button" class="codex-btn codex-btn--ghost glamour-slot-reset" data-track="reset-slot-outfit">恢復預設服裝</button>
+        <a class="glamour-slot-current-source codex-small" target="ffxiv-marketboard" hidden data-track="equipment-source" data-track-label="查裝備來源">目前裝備：查來源 →</a>
       </div>
     </div>`;
     const $ = (name) => element.querySelector(`.glamour-slot-${name}`);
@@ -118,6 +118,8 @@ export class SlotPanel {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'glamour-slot-dye-button';
+      button.dataset.track = 'open-dye';
+      button.dataset.trackLabel = '開啟染劑選擇';
       const id = stains[index] ?? 0;
       const label = `染劑 ${index + 1}：${this.palette.name(id)}`;
       button.title = label;

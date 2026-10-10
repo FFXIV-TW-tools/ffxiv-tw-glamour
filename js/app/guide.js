@@ -41,13 +41,13 @@ export class Guide {
           <p class="codex-body" id="pick-hint">按「選遊戲資料夾」會開啟「選取要上傳的資料夾」視窗：在視窗上方的路徑列貼上上方路徑並按 Enter，再按視窗裡的「上傳」。接著 Chrome 會問「要將 N 個檔案上傳到這個網站嗎？」，預設按鈕是取消，請按「上傳」。這兩處的「上傳」是瀏覽器固定的文字；檔案只在這個瀏覽器裡讀取，本站不會收到你的遊戲檔案。</p>
           <p class="codex-body" id="guide-returning">之前選過的話：Chrome 會記住上次選取的位置。如果視窗已停在你的遊戲資料夾，直接按視窗裡的「上傳」，Chrome 再問一次時也按「上傳」即可。這個位置是整個瀏覽器共用的；若視窗停在別處（例如期間在其他網站選過檔案或資料夾），請照上面的步驟重新找。</p>
           <p id="notice-required" class="codex-small">請先閱讀並確認使用須知，才能選遊戲資料夾。</p>
-          <button type="button" class="codex-btn codex-btn--primary" id="pick" disabled data-help="請先閱讀並確認使用須知，才能選遊戲資料夾。">選遊戲資料夾</button>
+          <button type="button" class="codex-btn codex-btn--primary" id="pick" disabled data-track="pick-folder" data-track-label="選取遊戲資料夾" data-help="請先閱讀並確認使用須知，才能選遊戲資料夾。">選遊戲資料夾</button>
           <input type="file" id="pick-dir" webkitdirectory hidden>
           <details class="codex-accordion glamour-guide-alt" id="files-alt"><summary>不在預設位置？或無法選資料夾？</summary>
             <div class="codex-accordion__body">
               <p class="codex-body">你可以手動找到包含 <code class="codex-code">game</code> 的遊戲安裝資料夾，或直接選取含 <code class="codex-code">ffxivgame.ver</code> 的 <code class="codex-code">game</code> 資料夾。</p>
               <p class="codex-body">若仍無法選資料夾，可改用「直接選檔」，一次選取同一份遊戲資料夾中的 <code class="codex-code">game/ffxivgame.ver</code>，以及以下編號開頭的全部 <code class="codex-code">.index</code> 與 <code class="codex-code">.dat</code> 檔案：<span id="guide-packs"></span>。</p>
-              <label class="codex-field__label" for="files">直接選檔</label><input type="file" id="files" class="codex-input" multiple disabled>
+              <label class="codex-field__label" for="files">直接選檔</label><input type="file" id="files" class="codex-input" multiple disabled data-track="pick-files" data-track-label="直接選取遊戲檔案">
             </div>
           </details>
         </section>
@@ -59,7 +59,7 @@ export class Guide {
             <li>回到這裡，按下方「載入外貌存檔」。</li>
             <li>選擇剛才保存的那個檔案。</li>
           </ol>
-          <div class="glamour-guide-actions"><button type="button" class="codex-btn codex-btn--ghost" id="guide-save" disabled data-help="請先選好遊戲資料夾，才能載入外貌存檔。">載入外貌存檔</button><button type="button" class="codex-btn codex-btn--ghost" id="guide-skip" disabled data-help="請先選好遊戲資料夾，才能略過這一步。">略過這一步</button></div>
+          <div class="glamour-guide-actions"><button type="button" class="codex-btn codex-btn--ghost" id="guide-save" disabled data-track="load-look-save" data-help="請先選好遊戲資料夾，才能載入外貌存檔。">載入外貌存檔</button><button type="button" class="codex-btn codex-btn--ghost" id="guide-skip" disabled data-help="請先選好遊戲資料夾，才能略過這一步。">略過這一步</button></div>
           <p class="codex-small">若略過，會先顯示遊戲的預設角色；之後也可以在「角色外貌」載入外貌存檔。</p>
         </section>
         <section class="glamour-guide-part" aria-labelledby="guide-adjust-title">

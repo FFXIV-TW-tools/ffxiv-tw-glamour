@@ -11,6 +11,7 @@ import { slotItems } from './slot-data.js';
 import { noticesAcknowledged } from './guide-notice.js';
 import { iconSVG } from './glamour-visual.js';
 
+const usageWindow = /** @type {Window & { XivUsage?: { track(name: string): void } }} */ (window);
 const $ = (selector) => document.querySelector(selector);
 const status = (text) => { $('#status').textContent = text; };
 const BUNDLE_LABEL = { indoor: '室內', aether: '乙太空間', coast: '海岸', forest: '森林', wilderness: '荒野' };
@@ -378,6 +379,7 @@ function bindDrag(canvas) {
     else if (event.key === 'ArrowDown') setViewState(state.zoom, [state.center[0], state.center[1] + 0.05 / state.zoom]);
     else return;
     event.preventDefault();
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') usageWindow.XivUsage && usageWindow.XivUsage.track('rotate-step');
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') presentOnly();
     else redraw({ interactive: true });
   });
@@ -389,6 +391,8 @@ $('#bundles').replaceChildren(...BUNDLES.map(key => {
   button.type = 'button';
   button.className = 'codex-chip';
   button.dataset.bundle = key;
+  button.dataset.track = 'switch-background';
+  button.dataset.trackLabel = '切換預覽背景';
   button.textContent = dl.buttonLabel(key);
   button.addEventListener('click', () => {
     if (!view || !packs) return;

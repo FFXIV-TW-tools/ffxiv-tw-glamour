@@ -91,7 +91,7 @@
           <span>背景</span><div id="bundles" class="glamour-backgrounds" role="group" aria-label="選擇背景"></div>
           <label for="angle">轉動</label><input type="range" id="angle" min="-180" max="180" step="1" value="0" aria-label="轉動角度"><span class="glamour-value" id="angle-v">0°</span>
           <label for="zoom">縮放</label><input type="range" id="zoom" min="1" max="4" step="0.25" value="1" aria-label="放大倍數"><span class="glamour-value" id="zoom-v">1×</span>
-          <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left">向左轉 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right">向右轉 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero">回正</button><button type="button" class="codex-btn codex-btn--ghost" id="glamour-refit">重設取景</button></div>
+          <div class="glamour-view-buttons"><button type="button" class="codex-btn codex-btn--ghost" id="left" data-track="rotate-step" data-track-label="轉動 15°">向左轉 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="right" data-track="rotate-step" data-track-label="轉動 15°">向右轉 15°</button><button type="button" class="codex-btn codex-btn--ghost" id="zero" data-track="reset-angle">回正</button><button type="button" class="codex-btn codex-btn--ghost" id="glamour-refit" data-track="refit-view">重設取景</button></div>
         </div>
         <p class="glamour-controls-hint codex-small" id="glamour-controls-hint">選取遊戲資料夾後可切換背景與取景。</p>
         <button type="button" class="codex-btn codex-btn--ghost glamour-view-toggle" id="view-controls-toggle" aria-expanded="true" aria-controls="view-controls-body">收起</button>
@@ -109,7 +109,7 @@
       </section>
       <section class="codex-tablet codex-tablet--cyan" id="slots-section" aria-label="裝備與染劑">
         <span class="codex-hud" aria-hidden="true"></span>
-        <div class="glamour-slots-head"><h2 class="codex-view-title" id="slots-title"><span class="codex-view-title__ico" aria-hidden="true"></span>裝備與染劑</h2><button type="button" class="codex-btn codex-btn--ghost" id="glamour-copy-outfit" disabled title="預覽就緒後可複製目前穿搭">複製目前穿搭</button></div>
+        <div class="glamour-slots-head"><h2 class="codex-view-title" id="slots-title"><span class="codex-view-title__ico" aria-hidden="true"></span>裝備與染劑</h2><button type="button" class="codex-btn codex-btn--ghost" id="glamour-copy-outfit" disabled title="預覽就緒後可複製目前穿搭" data-track="copy-outfit">複製目前穿搭</button></div>
         <p id="glamour-copy-status" class="codex-small" role="status" hidden></p>
         <div id="slots" class="codex-empty codex-empty--bare">選好遊戲資料夾後，就能更換裝備與染劑。</div>
       </section>
@@ -143,7 +143,7 @@
         <p>選好遊戲資料夾後，才會下載「室內」背景；切換到其他背景時，首次使用才下載。每個背景下載一次，之後保存在這個瀏覽器的網站資料中。要清除，可在瀏覽器設定中刪除此網站的資料；請避開有流量限制的網路。</p>
         <p id="notice-sizes" role="status">正在查詢各背景的下載大小…</p>
         <p>清除下方保存的遊戲資料後，下次使用需再選遊戲資料夾；已下載的背景網站資料會保留，以免重複下載。</p>
-        <button type="button" class="codex-btn codex-btn--danger" id="notice-clear">清除這個網站保存的遊戲資料</button>
+        <button type="button" class="codex-btn codex-btn--danger" id="notice-clear" data-track="clear-saved-data" data-track-label="清除保存的遊戲資料">清除這個網站保存的遊戲資料</button>
         <p id="notice-clear-status" class="codex-small" role="status"></p>
         <h4 class="codex-h3">顯示卡與瀏覽器</h4>
         <p>需要支援 WebGL2 並開啟圖形加速的桌面版瀏覽器。建議使用 Chrome 或 Edge；目前僅實測 Windows 上的 Chrome 1xx 與 NVIDIA RTX 5070 Ti，Edge 尚未實測。用處理器模擬繪圖時會非常慢。每種背景第一次出現時可能花數秒準備畫面。手機與平板目前不支援。</p>
